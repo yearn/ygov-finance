@@ -108,6 +108,9 @@ class App extends Component {
                   <Footer />
                   <Stake />
                 </Route>
+                <Route path="/staking">
+                  <RewardsPools />
+                </Route>
                 <Route path="/">
                   <RewardsPools />
                 </Route>

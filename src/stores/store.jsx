@@ -325,7 +325,7 @@ class Store {
   }
 
   _getstakedBalance = async (web3, asset, account, callback) => {
-    let erc20Contract = new web3.eth.Contract(config.yCurveFiRewardsABI, config.yCurveFiRewardsAddress)
+    let erc20Contract = new web3.eth.Contract(asset.rewardsABI, asset.rewardsAddress)
 
     try {
       var balance = await erc20Contract.methods.balanceOf(account.address).call({ from: account.address });
@@ -337,12 +337,12 @@ class Store {
   }
 
   _getRewardsAvailable = async (web3, asset, account, callback) => {
-    let erc20Contract = new web3.eth.Contract(config.yCurveFiRewardsABI, config.yCurveFiRewardsAddress)
+    let erc20Contract = new web3.eth.Contract(asset.rewardsABI, asset.rewardsAddress)
 
     try {
-      var rewards = await erc20Contract.methods.rewards(account.address).call({ from: account.address });
-      rewards = parseFloat(rewards)/10**asset.decimals
-      callback(null, parseFloat(rewards))
+      var earned = await erc20Contract.methods.earned(account.address).call({ from: account.address });
+      earned = parseFloat(earned)/10**asset.decimals
+      callback(null, parseFloat(earned))
     } catch(ex) {
       return callback(ex)
     }
