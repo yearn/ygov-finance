@@ -166,11 +166,10 @@ const iswapTheme =  {
         },
         color: colors.text,
         padding: '14px',
-        borderRadius: '50px'
       },
       root: {
         // border: "none !important",
-        borderRadius: '50px'
+        borderRadius: '25px'
       },
       notchedOutline: {
         // border: "none !important"

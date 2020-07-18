@@ -10,6 +10,7 @@ import { colors } from '../../theme'
 import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
 import HowToVoteIcon from '@material-ui/icons/HowToVote';
 import WbIncandescentIcon from '@material-ui/icons/WbIncandescent';
+import DetailsIcon from '@material-ui/icons/Details';
 
 const styles = theme => ({
   root: {
@@ -183,21 +184,23 @@ class Home extends Component {
   render() {
     const { classes, t, location } = this.props;
 
-    console.log(location)
-
     return (
       <div className={ classes.root }>
         <Card className={ `${classes.card} ${classes.earn}` } onClick={ () => { this.nav(location.pathname+'staking') } }>
-          <AttachMoneyIcon className={ `${classes.icon} icon` } />
+          <DetailsIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h3'} className={ `${classes.title} title` }>Stake</Typography>
         </Card>
         <Card className={ `${classes.card} ${classes.zap}` } onClick={ () => { this.nav(location.pathname+'propose') } }>
           <WbIncandescentIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h3'} className={ `${classes.title} title` }>Propose</Typography>
         </Card>
-        <Card className={ `${classes.card} ${classes.apr}` } onClick={ () => { this.nav(location.pathname+'vote') } }>
+        <Card className={ `${classes.card} ${classes.apr}` } onClick={ () => { return; this.nav(location.pathname+'vote') } }>
           <HowToVoteIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h3'} className={ `${classes.title} title` }>Vote</Typography>
+        </Card>
+        <Card className={ `${classes.card} ${classes.pool}` } onClick={ () => { this.nav(location.pathname+'claim') }}>
+          <AttachMoneyIcon className={ `${classes.icon} icon` } />
+          <Typography variant={'h3'} className={ `${classes.title} title` }>claim</Typography>
         </Card>
       </div>
     )

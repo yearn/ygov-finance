@@ -14,8 +14,10 @@ import Account from './components/account';
 import Footer from './components/footer';
 import Home from './components/home';
 import Stake from './components/stake';
-import RewardsPools from './components/rewardPools'
+import RewardsPools from './components/rewardPools';
 import Header from './components/header';
+import Propose from './components/propose';
+import Claim from './components/claim';
 
 import {
   CONNECTION_CONNECTED,
@@ -109,10 +111,19 @@ class App extends Component {
                   <Stake />
                 </Route>
                 <Route path="/staking">
+                  <Footer />
                   <RewardsPools />
                 </Route>
+                <Route path="/propose">
+                  <Footer />
+                  <Propose />
+                </Route>
+                <Route path="/claim">
+                  <Footer />
+                  <Claim />
+                </Route>
                 <Route path="/">
-                  <RewardsPools />
+                  <Home />
                 </Route>
               </Switch>
             </div>

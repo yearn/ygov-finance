@@ -14,7 +14,15 @@ import {
   GET_REWARDS,
   GET_REWARDS_RETURNED,
   EXIT,
-  EXIT_RETURNED
+  EXIT_RETURNED,
+  PROPOSE,
+  PROPOSE_RETURNED,
+  GET_CLAIMABLE_ASSET,
+  GET_CLAIMABLE_ASSET_RETURNED,
+  CLAIM,
+  CLAIM_RETURNED,
+  GET_CLAIMABLE,
+  GET_CLAIMABLE_RETURNED
 } from '../constants';
 import Web3 from 'web3';
 
@@ -76,6 +84,19 @@ class Store {
           code: 'zh'
         }
       ],
+      claimableAsset: {
+        id: 'yfi',
+        name: 'yearn.finance',
+        address: config.yfiAddress,
+        abi: config.yfiABI,
+        symbol: 'YFI',
+        balance: 0,
+        decimals: 18,
+        rewardAddress: '0xfc1e690f61efd961294b3e1ce3313fbd8aa4f85d',
+        rewardSymbol: 'aDAI',
+        rewardDecimals: 18,
+        claimableBalance: 0
+      },
       rewardPools: [
         {
           id: 'yearn',
@@ -193,6 +214,18 @@ class Store {
             break;
           case EXIT:
             this.exit(payload);
+            break;
+          case PROPOSE:
+            this.propose(payload)
+            break;
+          case GET_CLAIMABLE_ASSET:
+            this.getClaimableAsset(payload)
+            break;
+          case CLAIM:
+            this.claim(payload)
+            break;
+          case GET_CLAIMABLE:
+            this.getClaimable(payload)
             break;
           default: {
           }
@@ -605,6 +638,185 @@ class Store {
           callback(error)
         }
       })
+  }
+
+  propose = (payload) => {
+    const account = store.getStore('account')
+
+    this._callPropose(account, (err, res) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+
+      return emitter.emit(PROPOSE_RETURNED, res)
+    })
+  }
+
+  _callPropose = (account, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    const governanceContract = new web3.eth.Contract(config.governanceABI, config.governanceAddress)
+
+    governanceContract.methods.propose().send({ from: account.address, gasPrice: web3.utils.toWei(store.getStore('universalGasPrice'), 'gwei') })
+      .on('transactionHash', function(hash){
+        console.log(hash)
+        callback(null, hash)
+      })
+      .on('confirmation', function(confirmationNumber, receipt){
+        console.log(confirmationNumber, receipt);
+        if(confirmationNumber == 2) {
+          dispatcher.dispatch({ type: GET_BALANCES, content: {} })
+        }
+      })
+      .on('receipt', function(receipt){
+        console.log(receipt);
+      })
+      .on('error', function(error) {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+      .catch((error) => {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+  }
+
+  getClaimableAsset = (payload) => {
+    const account = store.getStore('account')
+    const asset = store.getStore('claimableAsset')
+
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    async.parallel([
+      (callbackInnerInner) => { this._getClaimableBalance(web3, asset, account, callbackInnerInner) },
+      (callbackInnerInner) => { this._getClaimable(web3, asset, account, callbackInnerInner) },
+    ], (err, data) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+
+      asset.balance = data[0]
+      asset.claimableBalance = data[1]
+
+      store.setStore({claimableAsset: asset})
+      emitter.emit(GET_CLAIMABLE_ASSET_RETURNED)
+    })
+  }
+
+  _getClaimableBalance = async (web3, asset, account, callback) => {
+    let erc20Contract = new web3.eth.Contract(asset.abi, asset.address)
+
+    try {
+      var balance = await erc20Contract.methods.balanceOf(account.address).call({ from: account.address });
+      balance = parseFloat(balance)/10**asset.decimals
+      callback(null, parseFloat(balance))
+    } catch(ex) {
+      return callback(ex)
+    }
+  }
+
+  _getClaimable = async (web3, asset, account, callback) => {
+    let claimContract = new web3.eth.Contract(config.claimABI, config.claimAddress)
+
+    try {
+      var balance = await claimContract.methods.claimable(account.address).call({ from: account.address });
+      balance = parseFloat(balance)/10**asset.decimals
+      callback(null, parseFloat(balance))
+    } catch(ex) {
+      return callback(ex)
+    }
+  }
+
+  claim = (payload) => {
+    const account = store.getStore('account')
+    const asset = store.getStore('claimableAsset')
+    const { amount } = payload.content
+
+    this._checkApproval(asset, account, amount, config.claimAddress, (err) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+
+      this._callClaim(asset, account, amount, (err, res) => {
+        if(err) {
+          return emitter.emit(ERROR, err);
+        }
+
+        return emitter.emit(CLAIM_RETURNED, res)
+      })
+    })
+  }
+
+  _callClaim = (asset, account, amount, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    const claimContract = new web3.eth.Contract(config.claimABI, config.claimAddress)
+
+    var amountToSend = web3.utils.toWei(amount, "ether")
+    if (asset.decimals != 18) {
+      amountToSend = (amount*10**asset.decimals).toFixed(0);
+    }
+
+    claimContract.methods.claim(amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei(store.getStore('universalGasPrice'), 'gwei') })
+      .on('transactionHash', function(hash){
+        console.log(hash)
+        callback(null, hash)
+      })
+      .on('confirmation', function(confirmationNumber, receipt){
+        console.log(confirmationNumber, receipt);
+        if(confirmationNumber == 2) {
+          dispatcher.dispatch({ type: GET_CLAIMABLE_ASSET, content: {} })
+        }
+      })
+      .on('receipt', function(receipt){
+        console.log(receipt);
+      })
+      .on('error', function(error) {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+      .catch((error) => {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+  }
+
+  getClaimable = (payload) => {
+    const account = store.getStore('account')
+    const asset = store.getStore('claimableAsset')
+
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    async.parallel([
+      (callbackInnerInner) => { this._getClaimableBalance(web3, asset, account, callbackInnerInner) },
+      (callbackInnerInner) => { this._getClaimable(web3, asset, account, callbackInnerInner) },
+    ], (err, data) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+
+      asset.balance = data[0]
+      asset.claimableBalance = data[1]
+
+      store.setStore({claimableAsset: asset})
+      emitter.emit(GET_CLAIMABLE_RETURNED)
+    })
   }
 }
 
