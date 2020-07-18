@@ -310,11 +310,11 @@ class Stake extends Component {
           </div>
           <div className={ classes.overviewField }>
             <Typography variant={ 'h3' } className={ classes.overviewTitle }>Currently Staked</Typography>
-            <Typography variant={ 'h2' } className={ classes.overviewValue }>{ pool.tokens[0].stakedBalance ? pool.tokens[0].stakedBalance.toFixed(2) : "0" } { pool.tokens[0].yfiSymbol }</Typography>
+            <Typography variant={ 'h2' } className={ classes.overviewValue }>{ pool.tokens[0].stakedBalance ? pool.tokens[0].stakedBalance.toFixed(2) : "0" }</Typography>
           </div>
           <div className={ classes.overviewField }>
             <Typography variant={ 'h3' } className={ classes.overviewTitle }>Rewards Available</Typography>
-            <Typography variant={ 'h2' } className={ classes.overviewValue }>{ pool.tokens[0].rewardsAvailable ? pool.tokens[0].rewardsAvailable.toFixed(2) : "0" } { pool.tokens[0].yfiSymbol }</Typography>
+            <Typography variant={ 'h2' } className={ classes.overviewValue }>{ pool.tokens[0].rewardsAvailable ? pool.tokens[0].rewardsAvailable.toFixed(2) : "0" } { pool.tokens[0].rewardsSymbol }</Typography>
           </div>
         </div>
         { value === 'options' && this.renderOptions() }
@@ -551,7 +551,7 @@ class Stake extends Component {
                 <div className={ classes.assetIcon }>
                   <img
                     alt=""
-                    src={ require('../../assets/'+asset.id+'-logo.png') }
+                    src={ require('../../assets/'+asset.symbol+'-logo.png') }
                     height="30px"
                   />
                 </div>

@@ -88,133 +88,35 @@ class Store {
               symbol: 'curve.fi',
               abi: config.erc20ABI,
               decimals: 18,
-              fyiAddress: config.yCurveFiRewardsAddress,
-              fyiABI: config.yCurveFiRewardsABI,
-              yfiSymbol: 'YFI',
+              rewardsAddress: config.yCurveFiRewardsAddress,
+              rewardsABI: config.yCurveFiRewardsABI,
+              rewardsSymbol: 'YFI',
               decimals: 18,
               balance: 0,
               stakedBalance: 0,
               rewardsAvailable: 0
             }
-            // {
-            //   id: 'ydaiv3',
-            //   address: '0xC2cB1040220768554cf699b0d863A3cd4324ce32',
-            //   symbol: 'yDAI',
-            //   abi: config.IEarnErc20ABIv2,
-            //   decimals: 18
-            // },
-            // {
-            //   id: 'yusdcv3',
-            //   address: '0x26EA744E5B887E5205727f55dFBE8685e3b21951',
-            //   symbol: 'yUSDC',
-            //   abi: config.IEarnErc20ABIv2,
-            //   decimals: 6
-            // },
-            // {
-            //   id: 'yUSDTv3',
-            //   address: '0xE6354ed5bC4b393a5Aad09f21c46E101e692d447',
-            //   symbol: 'yUSDT',
-            //   abi: config.IEarnErc20ABIv2,
-            //   decimals: 6
-            // },
-            // {
-            //   id: 'ybusdv3',
-            //   address: '0x04bC0Ab673d88aE9dbC9DA2380cB6B79C4BCa9aE',
-            //   symbol: 'yBUSD',
-            //   abi: config.IEarnErc20ABIv2,
-            //   decimals: 18
-            // },
-            // {
-            //   id: 'ydaiv2',
-            //   address: '0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01',
-            //   symbol: 'yDAI',
-            //   abi: config.IEarnErc20ABIv2,
-            //   decimals: 18
-            // },
-            // {
-            //   id: 'yusdcv2',
-            //   address: '0xd6aD7a6750A7593E092a9B218d66C0A814a3436e',
-            //   symbol: 'yUSDC',
-            //   abi: config.IEarnErc20ABIv2,
-            //   decimals: 6
-            // },
-            // {
-            //   id: 'yusdtv2',
-            //   address: '0x83f798e925BcD4017Eb265844FDDAbb448f1707D',
-            //   symbol: 'yUSDT',
-            //   abi: config.IEarnErc20ABIv2,
-            //   decimals: 6
-            // },
-            // {
-            //   id: 'ytusdv2',
-            //   address: '0x73a052500105205d34Daf004eAb301916DA8190f',
-            //   symbol: 'yTUSd',
-            //   abi: config.IEarnErc20ABIv2,
-            //   decimals: 18
-            // },
-            // {
-            //   id: 'yusdv2',
-            //   address: '0xF61718057901F84C4eEC4339EF8f0D86D2B45600',
-            //   symbol: 'ySUSD',
-            //   abi: config.IEarnErc20ABIv2,
-            //   decimals: 18
-            // },
-            // {
-            //   id: 'ywbtcv2',
-            //   address: '0x04Aa51bbcB46541455cCF1B8bef2ebc5d3787EC9',
-            //   symbol: 'yWBTC',
-            //   abi: config.IEarnErc20ABIv2,
-            //   decimals: 8
-            // },
-            // {
-            //   id: 'ydaiv1',
-            //   address: '0x9D25057e62939D3408406975aD75Ffe834DA4cDd',
-            //   symbol: 'yDAI',
-            //   abi: config.IEarnERC20ABI,
-            //   decimals: 18
-            // },
-            // {
-            //   id: 'yusdcv1',
-            //   address: '0xa2609B2b43AC0F5EbE27deB944d2a399C201E3dA',
-            //   symbol: 'yUSDC',
-            //   abi: config.IEarnERC20ABI,
-            //   decimals: 6
-            // },
-            // {
-            //   id: 'yusdtv1',
-            //   address: '0xa1787206d5b1bE0f432C4c4f96Dc4D1257A1Dd14',
-            //   symbol: 'yUSDT',
-            //   abi: config.IEarnERC20ABI,
-            //   decimals: 6
-            // },
-            // {
-            //   id: 'ysusdv1',
-            //   address: '0x36324b8168f960A12a8fD01406C9C78143d41380',
-            //   symbol: 'ySUSD',
-            //   abi: config.IEarnERC20ABI,
-            //   decimals: 18
-            // },
-            // {
-            //   id: 'ybtcv1',
-            //   address: '0x04EF8121aD039ff41d10029c91EA1694432514e9',
-            //   symbol: 'yBTC',
-            //   abi: config.IEarnERC20ABI,
-            //   decimals: 8,
-            // },
-            // {
-            //   id: 'ycrvv1',
-            //   address: '0x9Ce551A9D2B1A4Ec0cc6eB0E0CC12977F6ED306C',
-            //   symbol: 'yCRV',
-            //   abi: config.IEarnERC20ABI,
-            //   decimals: 18
-            // },
-            // {
-            //   id: 'iethv1',
-            //   address: '0x9Dde7cdd09dbed542fC422d18d89A589fA9fD4C0',
-            //   symbol: 'iETH',
-            //   abi: config.IEarnABI,
-            //   decimals: 18
-            // }
+          ]
+        },
+        {
+          id: 'balancer',
+          name: 'Balancer Pool',
+          website: 'https://balancer.exchange/',
+          tokens: [
+            {
+              id: 'bpt',
+              address: '0x60626db611a9957C1ae4Ac5b7eDE69e24A3B76c5',
+              symbol: 'BPT',
+              abi: config.erc20ABI,
+              decimals: 18,
+              rewardsAddress: config.balancerRewardsAddress,
+              rewardsABI: config.balancerRewardsABI,
+              rewardsSymbol: 'YFI',
+              decimals: 18,
+              balance: 0,
+              stakedBalance: 0,
+              rewardsAvailable: 0
+            }
           ]
         },
         {
@@ -227,8 +129,8 @@ class Store {
             //   address: '0x048930eec73c91B44b0844aEACdEBADC2F2b6efb',
             //   symbol: 'aUniDAI',
             //   abi: config.erc20ABI,
-            //   fyiAddress: config.yCurveFiRewardsAddress,
-            //   fyiABI: config.yCurveFiRewardsABI,
+            //   rewardsAddress: config.yCurveFiRewardsAddress,
+            //   rewardsABI: config.yCurveFiRewardsABI,
             //   decimals: 18,
             //   balance: 0,
             //   stakedBalance: 0,
@@ -252,14 +154,14 @@ class Store {
 
           ]
         },
-        {
-          id: 'ileverage',
-          name: 'ileverage.finance',
-          website: 'https://ileverage.finance',
-          tokens: [
-
-          ]
-        },
+        // {
+        //   id: 'ileverage',
+        //   name: 'ileverage.finance',
+        //   website: 'https://ileverage.finance',
+        //   tokens: [
+        //
+        //   ]
+        // },
         {
           id: 'ipool',
           name: 'ipool.finance',
@@ -335,13 +237,9 @@ class Store {
             return callbackInner(err)
           }
 
-          console.log(data)
-
           token.balance = data[0]
           token.stakedBalance = data[1]
           token.rewardsAvailable = data[2]
-
-          console.log(token)
 
           callbackInner(null, token)
         })
@@ -351,7 +249,6 @@ class Store {
           return callback(err)
         }
 
-        console.log(tokensData)
         pool.tokens = tokensData
         callback(null, pool)
       })
@@ -498,7 +395,7 @@ class Store {
     const account = store.getStore('account')
     const { asset, amount } = payload.content
 
-    this._checkApproval(asset, account, amount, asset.fyiAddress, (err) => {
+    this._checkApproval(asset, account, amount, asset.rewardsAddress, (err) => {
       if(err) {
         return emitter.emit(ERROR, err);
       }
@@ -516,7 +413,7 @@ class Store {
   _callStake = (asset, account, amount, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
-    const yCurveFiContract = new web3.eth.Contract(asset.fyiABI, asset.fyiAddress)
+    const yCurveFiContract = new web3.eth.Contract(asset.rewardsABI, asset.rewardsAddress)
 
     var amountToSend = web3.utils.toWei(amount, "ether")
     if (asset.decimals != 18) {
@@ -571,7 +468,7 @@ class Store {
   _callWithdraw = (asset, account, amount, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
-    const yCurveFiContract = new web3.eth.Contract(asset.fyiABI, asset.fyiAddress)
+    const yCurveFiContract = new web3.eth.Contract(asset.rewardsABI, asset.rewardsAddress)
 
     var amountToSend = web3.utils.toWei(amount, "ether")
     if (asset.decimals != 18) {
@@ -626,7 +523,7 @@ class Store {
   _callGetReward = (asset, account, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
-    const yCurveFiContract = new web3.eth.Contract(asset.fyiABI, asset.fyiAddress)
+    const yCurveFiContract = new web3.eth.Contract(asset.rewardsABI, asset.rewardsAddress)
 
     yCurveFiContract.methods.getReward().send({ from: account.address, gasPrice: web3.utils.toWei(store.getStore('universalGasPrice'), 'gwei') })
       .on('transactionHash', function(hash){
@@ -676,7 +573,7 @@ class Store {
   _callExit = (asset, account, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
-    const yCurveFiContract = new web3.eth.Contract(asset.fyiABI, asset.fyiAddress)
+    const yCurveFiContract = new web3.eth.Contract(asset.rewardsABI, asset.rewardsAddress)
 
     yCurveFiContract.methods.exit().send({ from: account.address, gasPrice: web3.utils.toWei(store.getStore('universalGasPrice'), 'gwei') })
       .on('transactionHash', function(hash){
