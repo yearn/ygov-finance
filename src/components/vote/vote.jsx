@@ -362,11 +362,11 @@ class Vote extends Component {
                 </div>
               </div>
               <div className={classes.heading}>
-                <Typography variant={ 'h3' }>{ proposal.totalForVotes }</Typography>
+                <Typography variant={ 'h3' }>{ proposal.totalForVotes ? (parseFloat(proposal.totalForVotes)/10**18).toFixed(4) : 0 }</Typography>
                 <Typography variant={ 'h5' } className={ classes.grey }>Votes For</Typography>
               </div>
               <div className={classes.heading}>
-                <Typography variant={ 'h3' }>{ proposal.totalAgainstVotes }</Typography>
+                <Typography variant={ 'h3' }>{ proposal.totalAgainstVotes ? (parseFloat(proposal.totalAgainstVotes)/10**18).toFixed(4) : 0 }</Typography>
                 <Typography variant={ 'h5' } className={ classes.grey }>Votes Against</Typography>
               </div>
             </div>

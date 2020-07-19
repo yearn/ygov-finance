@@ -737,7 +737,7 @@ class Store {
         return emitter.emit(ERROR, err);
       }
 
-      let arr = Array.from(Array(proposalCount).keys())
+      let arr = Array.from(Array(parseInt(proposalCount)).keys())
 
       if(proposalCount == 0) {
         arr = []
