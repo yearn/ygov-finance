@@ -17,6 +17,12 @@ import {
   EXIT_RETURNED,
   PROPOSE,
   PROPOSE_RETURNED,
+  GET_PROPOSALS,
+  GET_PROPOSALS_RETURNED,
+  VOTE_FOR,
+  VOTE_FOR_RETURNED,
+  VOTE_AGAINST,
+  VOTE_AGAINST_RETURNED,
   GET_CLAIMABLE_ASSET,
   GET_CLAIMABLE_ASSET_RETURNED,
   CLAIM,
@@ -83,6 +89,8 @@ class Store {
           language: 'Chinese',
           code: 'zh'
         }
+      ],
+      proposals: [
       ],
       claimableAsset: {
         id: 'yfi',
@@ -238,6 +246,15 @@ class Store {
             break;
           case PROPOSE:
             this.propose(payload)
+            break;
+          case GET_PROPOSALS:
+            this.getProposals(payload)
+            break;
+          case VOTE_FOR:
+            this.voteFor(payload)
+            break;
+          case VOTE_AGAINST:
+            this.voteAgainst(payload)
             break;
           case GET_CLAIMABLE_ASSET:
             this.getClaimableAsset(payload)
@@ -687,6 +704,156 @@ class Store {
         console.log(confirmationNumber, receipt);
         if(confirmationNumber == 2) {
           dispatcher.dispatch({ type: GET_BALANCES, content: {} })
+        }
+      })
+      .on('receipt', function(receipt){
+        console.log(receipt);
+      })
+      .on('error', function(error) {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+      .catch((error) => {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+  }
+
+  getProposals = (payload) => {
+    // emitter.emit(GET_PROPOSALS_RETURNED)
+    const account = store.getStore('account')
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    this._getProposalCount(web3, account, (err, proposalCount) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+
+      let arr = Array.from(Array(proposalCount).keys())
+
+      if(proposalCount == 0) {
+        arr = []
+      }
+
+      async.map(arr, (proposal, callback) => {
+        this._getProposals(web3, account, proposal, callback)
+      }, (err, proposalsData) => {
+        if(err) {
+          return emitter.emit(ERROR, err);
+        }
+
+        store.setStore({ proposals: proposalsData })
+        emitter.emit(GET_PROPOSALS_RETURNED)
+      })
+
+    })
+  }
+
+  _getProposalCount = async (web3, account, callback) => {
+    try {
+      const governanceContract = new web3.eth.Contract(config.governanceABI, config.governanceAddress)
+      var proposals = await governanceContract.methods.proposalCount().call({ from: account.address });
+      callback(null, proposals)
+    } catch(ex) {
+      return callback(ex)
+    }
+  }
+
+  _getProposals = async (web3, account, number, callback) => {
+    try {
+      const governanceContract = new web3.eth.Contract(config.governanceABI, config.governanceAddress)
+      var proposals = await governanceContract.methods.proposals(number).call({ from: account.address });
+      callback(null, proposals)
+    } catch(ex) {
+      return callback(ex)
+    }
+  }
+
+  voteFor = (payload) => {
+    const account = store.getStore('account')
+    const { proposal } = payload.content
+
+    this._callVoteFor(proposal, account, (err, res) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+
+      return emitter.emit(VOTE_FOR_RETURNED, res)
+    })
+  }
+
+  _callVoteFor = (proposal, account, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    const governanceContract = new web3.eth.Contract(config.governanceABI, config.governanceAddress)
+
+    governanceContract.methods.voteFor(proposal.id).send({ from: account.address, gasPrice: web3.utils.toWei(store.getStore('universalGasPrice'), 'gwei') })
+      .on('transactionHash', function(hash){
+        console.log(hash)
+        callback(null, hash)
+      })
+      .on('confirmation', function(confirmationNumber, receipt){
+        console.log(confirmationNumber, receipt);
+        if(confirmationNumber == 2) {
+          dispatcher.dispatch({ type: GET_PROPOSALS, content: {} })
+        }
+      })
+      .on('receipt', function(receipt){
+        console.log(receipt);
+      })
+      .on('error', function(error) {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+      .catch((error) => {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+  }
+
+  voteAgainst = (payload) => {
+    const account = store.getStore('account')
+    const { proposal } = payload.content
+
+    this._callVoteAgainst(proposal, account, (err, res) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+
+      return emitter.emit(VOTE_AGAINST_RETURNED, res)
+    })
+  }
+
+  _callVoteAgainst = (proposal, account, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    const governanceContract = new web3.eth.Contract(config.governanceABI, config.governanceAddress)
+
+    governanceContract.methods.voteAgainst(proposal.id).send({ from: account.address, gasPrice: web3.utils.toWei(store.getStore('universalGasPrice'), 'gwei') })
+      .on('transactionHash', function(hash){
+        console.log(hash)
+        callback(null, hash)
+      })
+      .on('confirmation', function(confirmationNumber, receipt){
+        console.log(confirmationNumber, receipt);
+        if(confirmationNumber == 2) {
+          dispatcher.dispatch({ type: GET_PROPOSALS, content: {} })
         }
       })
       .on('receipt', function(receipt){

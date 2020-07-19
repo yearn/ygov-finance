@@ -16,8 +16,9 @@ import Home from './components/home';
 import Stake from './components/stake';
 import RewardsPools from './components/rewardPools';
 import Header from './components/header';
-import Propose from './components/propose';
+// import Propose from './components/propose';
 import Claim from './components/claim';
+import Vote from './components/vote';
 
 import {
   CONNECTION_CONNECTED,
@@ -114,9 +115,9 @@ class App extends Component {
                   <Footer />
                   <RewardsPools />
                 </Route>
-                <Route path="/propose">
+                <Route path="/vote">
                   <Footer />
-                  <Propose />
+                  <Vote />
                 </Route>
                 <Route path="/claim">
                   <Footer />

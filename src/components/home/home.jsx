@@ -190,11 +190,11 @@ class Home extends Component {
           <DetailsIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h3'} className={ `${classes.title} title` }>Stake</Typography>
         </Card>
-        <Card className={ `${classes.card} ${classes.zap}` } onClick={ () => { this.nav(location.pathname+'propose') } }>
+        {/*<Card className={ `${classes.card} ${classes.zap}` } onClick={ () => { this.nav(location.pathname+'propose') } }>
           <WbIncandescentIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h3'} className={ `${classes.title} title` }>Propose</Typography>
-        </Card>
-        <Card className={ `${classes.card} ${classes.apr}` } onClick={ () => { return; this.nav(location.pathname+'vote') } }>
+        </Card>*/}
+        <Card className={ `${classes.card} ${classes.zap}` } onClick={ () => { this.nav(location.pathname+'vote') } }>
           <HowToVoteIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h3'} className={ `${classes.title} title` }>Vote</Typography>
         </Card>
