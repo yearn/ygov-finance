@@ -141,6 +141,27 @@ class Store {
           ]
         },
         {
+          id: 'Governance',
+          name: 'Governance',
+          website: 'https://ygov.finance/',
+          tokens: [
+            {
+              id: 'bpt',
+              address: '0x95c4b6c7cff608c0ca048df8b81a484aa377172b',
+              symbol: 'BPT',
+              abi: config.bpoolABI,
+              decimals: 18,
+              rewardsAddress: config.governanceAddress,
+              rewardsABI: config.governanceABI,
+              rewardsSymbol: 'YFI',
+              decimals: 18,
+              balance: 0,
+              stakedBalance: 0,
+              rewardsAvailable: 0
+            }
+          ]
+        },
+        {
           id: 'yswap',
           name: 'yswap.finance',
           website: 'https://yswap.finance',
@@ -167,14 +188,14 @@ class Store {
 
           ]
         },
-        {
-          id: 'iliquidate',
-          name: 'iliquidate.finance',
-          website: 'https://iliquidate.finance',
-          tokens: [
-
-          ]
-        },
+        // {
+        //   id: 'iliquidate',
+        //   name: 'iliquidate.finance',
+        //   website: 'https://iliquidate.finance',
+        //   tokens: [
+        //
+        //   ]
+        // },
         // {
         //   id: 'ileverage',
         //   name: 'ileverage.finance',
