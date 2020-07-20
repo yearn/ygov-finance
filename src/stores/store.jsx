@@ -170,6 +170,27 @@ class Store {
           ]
         },
         {
+          id: 'Fee Rewards',
+          name: 'Fee Rewards',
+          website: 'https://ygov.finance/',
+          tokens: [
+            {
+              id: 'yfi',
+              address: config.yfiAddress,
+              symbol: 'YFI',
+              abi: config.yfiABI,
+              decimals: 18,
+              rewardsAddress: config.feeRewardsAddress,
+              rewardsABI: config.feeRewardsABI,
+              rewardsSymbol: 'yCRV',
+              decimals: 18,
+              balance: 0,
+              stakedBalance: 0,
+              rewardsAvailable: 0
+            }
+          ]
+        },
+        {
           id: 'yswap',
           name: 'yswap.finance',
           website: 'https://yswap.finance',
@@ -212,14 +233,14 @@ class Store {
         //
         //   ]
         // },
-        {
-          id: 'ipool',
-          name: 'ipool.finance',
-          website: 'https://ipool.finance',
-          tokens: [
-
-          ]
-        }
+        // {
+        //   id: 'ipool',
+        //   name: 'ipool.finance',
+        //   website: 'https://ipool.finance',
+        //   tokens: [
+        //
+        //   ]
+        // }
       ]
     }
 

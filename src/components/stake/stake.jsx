@@ -242,7 +242,7 @@ class Stake extends Component {
     emitter.on(STAKE_RETURNED, this.showHash);
     emitter.on(WITHDRAW_RETURNED, this.showHash);
     emitter.on(EXIT_RETURNED, this.showHash);
-    emitter.on(GET_REWARDS, this.showHash);
+    emitter.on(GET_REWARDS_RETURNED, this.showHash);
   }
 
   componentWillUnmount() {
@@ -250,7 +250,7 @@ class Stake extends Component {
     emitter.removeListener(STAKE_RETURNED, this.showHash);
     emitter.removeListener(WITHDRAW_RETURNED, this.showHash);
     emitter.removeListener(EXIT_RETURNED, this.showHash);
-    emitter.removeListener(GET_REWARDS, this.showHash);
+    emitter.removeListener(GET_REWARDS_RETURNED, this.showHash);
   };
 
   showHash  = (txHash) => {
