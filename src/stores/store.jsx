@@ -28,7 +28,9 @@ import {
   CLAIM,
   CLAIM_RETURNED,
   GET_CLAIMABLE,
-  GET_CLAIMABLE_RETURNED
+  GET_CLAIMABLE_RETURNED,
+  GET_YCRV_REQUIREMENTS,
+  GET_YCRV_REQUIREMENTS_RETURNED,
 } from '../constants';
 import Web3 from 'web3';
 
@@ -182,7 +184,7 @@ class Store {
               decimals: 18,
               rewardsAddress: config.feeRewardsAddress,
               rewardsABI: config.feeRewardsABI,
-              rewardsSymbol: 'yCRV',
+              rewardsSymbol: '$',
               decimals: 18,
               balance: 0,
               stakedBalance: 0,
@@ -285,6 +287,9 @@ class Store {
             break;
           case GET_CLAIMABLE:
             this.getClaimable(payload)
+            break;
+          case GET_YCRV_REQUIREMENTS:
+            this.getYCRVRequirements(payload)
             break;
           default: {
           }
@@ -1026,6 +1031,31 @@ class Store {
       store.setStore({claimableAsset: asset})
       emitter.emit(GET_CLAIMABLE_RETURNED)
     })
+  }
+
+  getYCRVRequirements = async (payload) => {
+    try {
+      const account = store.getStore('account')
+      const web3 = new Web3(store.getStore('web3context').library.provider);
+
+      const governanceContract = new web3.eth.Contract(config.governanceABI, config.governanceAddress)
+      let balance = await governanceContract.methods.balanceOf(account.address).call({ from: account.address })
+      balance = parseFloat(balance)/10**18
+
+      const voteLock = await governanceContract.methods.voteLock(account.address).call({ from: account.address })
+      const currentBlock = await web3.eth.getBlockNumber()
+
+      const returnOBJ = {
+        balanceValid: (balance > 1000),
+        voteLockValid: voteLock > currentBlock
+      }
+
+      console.log(returnOBJ)
+      emitter.emit(GET_YCRV_REQUIREMENTS_RETURNED, returnOBJ)
+
+    } catch(ex) {
+      return emitter.emit(ERROR, ex);
+    }
   }
 }
 

@@ -10,6 +10,9 @@ import {
 } from '@material-ui/core';
 import { withNamespaces } from 'react-i18next';
 
+import CheckIcon from '@material-ui/icons/Check';
+import ClearIcon from '@material-ui/icons/Clear';
+
 import Loader from '../loader'
 import Snackbar from '../snackbar'
 
@@ -26,7 +29,9 @@ import {
   GET_REWARDS,
   GET_REWARDS_RETURNED,
   EXIT,
-  EXIT_RETURNED
+  EXIT_RETURNED,
+  GET_YCRV_REQUIREMENTS,
+  GET_YCRV_REQUIREMENTS_RETURNED
 } from '../../constants'
 
 const styles = theme => ({
@@ -210,6 +215,13 @@ const styles = theme => ({
   },
   stakeButton: {
     minWidth: '300px'
+  },
+  requirement: {
+    display: 'flex',
+    alignItems: 'center'
+  },
+  check: {
+    paddingTop: '6px'
   }
 })
 
@@ -233,7 +245,13 @@ class Stake extends Component {
       pool: pool,
       loading: !(account || pool),
       account: account,
-      value: 'options'
+      value: 'options',
+      voteLockValid: false,
+      balanceValid: false
+    }
+
+    if(pool && pool.id === 'Fee Rewards') {
+      dispatcher.dispatch({ type: GET_YCRV_REQUIREMENTS, content: {} })
     }
   }
 
@@ -243,6 +261,7 @@ class Stake extends Component {
     emitter.on(WITHDRAW_RETURNED, this.showHash);
     emitter.on(EXIT_RETURNED, this.showHash);
     emitter.on(GET_REWARDS_RETURNED, this.showHash);
+    emitter.on(GET_YCRV_REQUIREMENTS_RETURNED, this.yCrvRequirementsReturned);
   }
 
   componentWillUnmount() {
@@ -251,7 +270,15 @@ class Stake extends Component {
     emitter.removeListener(WITHDRAW_RETURNED, this.showHash);
     emitter.removeListener(EXIT_RETURNED, this.showHash);
     emitter.removeListener(GET_REWARDS_RETURNED, this.showHash);
+    emitter.removeListener(GET_YCRV_REQUIREMENTS_RETURNED, this.yCrvRequirementsReturned);
   };
+
+  yCrvRequirementsReturned = (requirements) => {
+    this.setState({
+      balanceValid: requirements.balanceValid,
+      voteLockValid: requirements.voteLockValid,
+    })
+  }
 
   showHash  = (txHash) => {
     this.setState({ snackbarMessage: null, snackbarType: null, loading: false })
@@ -281,7 +308,9 @@ class Stake extends Component {
       modalOpen,
       pool,
       loading,
-      snackbarMessage
+      snackbarMessage,
+      voteLockValid,
+      balanceValid
     } = this.state
 
     var address = null;
@@ -314,9 +343,20 @@ class Stake extends Component {
           </div>
           <div className={ classes.overviewField }>
             <Typography variant={ 'h3' } className={ classes.overviewTitle }>Rewards Available</Typography>
-            <Typography variant={ 'h2' } className={ classes.overviewValue }>{ pool.tokens[0].rewardsAvailable ? pool.tokens[0].rewardsAvailable.toFixed(2) : "0" } { pool.tokens[0].rewardsSymbol }</Typography>
+            <Typography variant={ 'h2' } className={ classes.overviewValue }>{ pool.tokens[0].rewardsSymbol == '$' ? pool.tokens[0].rewardsSymbol : '' } { pool.tokens[0].rewardsAvailable ? pool.tokens[0].rewardsAvailable.toFixed(2) : "0" } { pool.tokens[0].rewardsSymbol != '$' ? pool.tokens[0].rewardsSymbol : '' }</Typography>
           </div>
         </div>
+        { pool.id === 'Fee Rewards' &&
+          <div className={ classes.actions }>
+            <Typography className={ classes.stakeTitle } variant={ 'h3'}>yCRV reward requirements</Typography>
+            <div className={ classes.requirement }>
+              <Typography variant={'h4'}>You must have voted in a proposal recently</Typography><Typography variant={'h4'} className={ classes.check }>{ voteLockValid ? <CheckIcon style={{ color: colors.green }} /> : <ClearIcon style={{ color: colors.red }} /> }</Typography>
+            </div>
+            <div className={ classes.requirement }>
+              <Typography variant={'h4'}>You must have at least 1000 BPT staked in the Governance pool</Typography><Typography variant={'h4'} className={ classes.check }>{ balanceValid ? <CheckIcon style={{ color: colors.green }} /> : <ClearIcon style={{ color: colors.red }} /> }</Typography>
+            </div>
+          </div>
+        }
         { value === 'options' && this.renderOptions() }
         { value === 'stake' && this.renderStake() }
         { value === 'claim' && this.renderClaim() }
@@ -331,7 +371,7 @@ class Stake extends Component {
 
   renderOptions = () => {
     const { classes } = this.props;
-    const { loading } = this.state
+    const { loading, pool, voteLockValid, balanceValid } = this.state
 
     return (
       <div className={ classes.actions }>
@@ -341,7 +381,7 @@ class Stake extends Component {
             className={ classes.primaryButton }
             variant="outlined"
             color="primary"
-            disabled={ loading }
+            disabled={ (pool.id === 'Fee Rewards' ?  (loading || !voteLockValid || !balanceValid) : loading) }
             onClick={ () => { this.navigateInternal('stake') } }
             >
             <Typography className={ classes.stakeButtonText } variant={ 'h4'}>Stake Tokens</Typography>

@@ -15,6 +15,8 @@ import { colors } from '../../theme'
 import {
   ERROR,
   CONFIGURE_RETURNED,
+  GET_BALANCES,
+  GET_BALANCES_RETURNED,
 } from '../../constants'
 
 const styles = theme => ({
@@ -165,15 +167,24 @@ class RewardPools extends Component {
       loading: !(account && rewardPools),
       account: account
     }
+
+    dispatcher.dispatch({ type: GET_BALANCES, content: {} })
   }
 
   componentWillMount() {
-    emitter.on(CONFIGURE_RETURNED, this.configureReturned)
+    emitter.on(CONFIGURE_RETURNED, this.configureReturned);
+    emitter.on(GET_BALANCES_RETURNED, this.balancesReturned);
   }
 
   componentWillUnmount() {
-    emitter.removeListener(CONFIGURE_RETURNED, this.configureReturned)
+    emitter.removeListener(CONFIGURE_RETURNED, this.configureReturned);
+    emitter.removeListener(GET_BALANCES_RETURNED, this.balancesReturned);
   };
+
+  balancesReturned = () => {
+    const rewardPools = store.getStore('rewardPools')
+    this.setState({ rewardPools: rewardPools })
+  }
 
   configureReturned = () => {
     this.setState({ loading: false })
