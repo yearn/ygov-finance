@@ -119,10 +119,10 @@ class App extends Component {
                   <Footer />
                   <Vote />
                 </Route>
-                <Route path="/claim">
+                {/*<Route path="/claim">
                   <Footer />
                   <Claim />
-                </Route>
+                </Route>*/}
                 <Route path="/">
                   <Home />
                 </Route>
