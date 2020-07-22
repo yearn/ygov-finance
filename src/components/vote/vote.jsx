@@ -10,6 +10,8 @@ import {
   ExpansionPanelDetails,
   ExpansionPanelSummary,
 } from '@material-ui/core';
+import ToggleButton from '@material-ui/lab/ToggleButton';
+import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import { withNamespaces } from 'react-i18next';
 
 import Loader from '../loader'
@@ -211,6 +213,9 @@ const styles = theme => ({
     background: colors.white,
     width: '100%'
   },
+  stakeButton: {
+    minWidth: '300px'
+  }
 })
 
 const emitter = Store.emitter
@@ -228,7 +233,8 @@ class Vote extends Component {
     this.state = {
       loading: false,
       account: account,
-      proposals: proposals
+      proposals: proposals,
+      value: 1
     }
 
     dispatcher.dispatch({ type: GET_PROPOSALS, content: {} })
@@ -304,6 +310,29 @@ class Vote extends Component {
           </Card>
           <div className={ classes.between }>
           </div>
+          <div>
+            <Button
+              className={ classes.stakeButton }
+              variant="outlined"
+              color="secondary"
+              disabled={ loading }
+              onClick={ () => { this.goToDashboard() } }
+            >
+              <Typography variant={ 'h4'}>Go to Voting Dashboard</Typography>
+            </Button>
+          </div>
+        </div>
+        <div className={ classes.intro }>
+          <ToggleButtonGroup value={value} onChange={this.handleTabChange} aria-label="version" exclusive size={ 'small' }>
+            <ToggleButton value={0} aria-label="v1">
+              <Typography variant={ 'h4' }>Done</Typography>
+            </ToggleButton>
+            <ToggleButton value={1} aria-label="v2">
+              <Typography variant={ 'h4' }>Open</Typography>
+            </ToggleButton>
+          </ToggleButtonGroup>
+          <div className={ classes.between }>
+          </div>
           <div className={ classes.proposalContainer }>
             <Button
               className={ classes.stakeButton }
@@ -325,7 +354,7 @@ class Vote extends Component {
   }
 
   renderProposals = () => {
-    const { proposals, expanded } = this.state
+    const { proposals, expanded, value } = this.state
     const { classes, t } = this.props
     const width = window.innerWidth
 
@@ -337,8 +366,11 @@ class Vote extends Component {
       )
     }
 
-    return proposals.map((proposal) => {
+    let now = store.getStore('currentBlock')
 
+    return proposals.filter((proposal) => {
+      return (value === 0 ? proposal.end < now : proposal.end > now)
+    }).map((proposal) => {
       var address = null;
       if (proposal.proposer) {
         address = proposal.proposer.substring(0,8)+'...'+proposal.proposer.substring(proposal.proposer.length-6,proposal.proposer.length)
@@ -378,6 +410,14 @@ class Vote extends Component {
       )
     })
   }
+
+  goToDashboard = () => {
+    window.open('https://gov.yearn.finance/', "_blank")
+  }
+
+  handleTabChange = (event, newValue) => {
+    this.setState({value:newValue})
+  };
 
   startLoading = () => {
     this.setState({ loading: true })

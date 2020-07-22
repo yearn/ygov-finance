@@ -60,6 +60,7 @@ class Store {
   constructor() {
 
     this.store = {
+      currentBlock: 0,
       universalGasPrice: '70',
       account: {},
       web3: null,
@@ -308,7 +309,12 @@ class Store {
     return emitter.emit('StoreUpdated');
   };
 
-  configure = () => {
+  configure = async () => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+    const currentBlock = await web3.eth.getBlockNumber()
+
+    store.setStore({ currentBlock: currentBlock })
+
     window.setTimeout(() => {
       emitter.emit(CONFIGURE_RETURNED)
     }, 100)
