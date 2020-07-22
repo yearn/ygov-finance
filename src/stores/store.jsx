@@ -1053,10 +1053,10 @@ class Store {
 
       const returnOBJ = {
         balanceValid: (balance > 1000),
-        voteLockValid: voteLock > currentBlock
+        voteLockValid: voteLock > currentBlock,
+        voteLock: voteLock
       }
 
-      console.log(returnOBJ)
       emitter.emit(GET_YCRV_REQUIREMENTS_RETURNED, returnOBJ)
 
     } catch(ex) {

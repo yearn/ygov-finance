@@ -222,6 +222,9 @@ const styles = theme => ({
   },
   check: {
     paddingTop: '6px'
+  },
+  voteLockMessage: {
+    margin: '20px'
   }
 })
 
@@ -247,10 +250,11 @@ class Stake extends Component {
       account: account,
       value: 'options',
       voteLockValid: false,
-      balanceValid: false
+      balanceValid: false,
+      voteLock: null
     }
 
-    if(pool && pool.id === 'Fee Rewards') {
+    if(pool && ['Fee Rewards', 'Governance'].includes(pool.id)) {
       dispatcher.dispatch({ type: GET_YCRV_REQUIREMENTS, content: {} })
     }
   }
@@ -277,6 +281,7 @@ class Stake extends Component {
     this.setState({
       balanceValid: requirements.balanceValid,
       voteLockValid: requirements.voteLockValid,
+      voteLock: requirements.voteLock
     })
   }
 
@@ -371,7 +376,7 @@ class Stake extends Component {
 
   renderOptions = () => {
     const { classes } = this.props;
-    const { loading, pool, voteLockValid, balanceValid } = this.state
+    const { loading, pool, voteLockValid, balanceValid, voteLock } = this.state
 
     return (
       <div className={ classes.actions }>
@@ -405,7 +410,7 @@ class Stake extends Component {
             className={ classes.actionButton }
             variant="outlined"
             color="primary"
-            disabled={ loading }
+            disabled={ (pool.id === 'Governance' ? (loading || voteLockValid ) : loading  ) }
             onClick={ () => { this.navigateInternal('unstake') } }
             >
             <Typography className={ classes.buttonText } variant={ 'h4'}>Unstake Tokens</Typography>
@@ -417,12 +422,13 @@ class Stake extends Component {
             className={ classes.actionButton }
             variant="outlined"
             color="primary"
-            disabled={ loading }
+            disabled={ (pool.id === 'Governance' ? (loading || voteLockValid ) : loading  ) }
             onClick={ () => { this.onExit() } }
             >
             <Typography className={ classes.buttonText } variant={ 'h4'}>Exit: Claim and Unstake</Typography>
           </Button>
         </div>
+        { (pool.id === 'Governance' && voteLockValid) && <Typography variant={'h4'} className={ classes.voteLockMessage }>Unstaking tokens only allowed once all your pending votes have closed at Block: {voteLock}</Typography>}
       </div>
     )
   }
@@ -468,7 +474,7 @@ class Stake extends Component {
 
   renderUnstake = () => {
     const { classes } = this.props;
-    const { loading, pool } = this.state
+    const { loading, pool, voteLockValid } = this.state
 
     const asset = pool.tokens[0]
 
@@ -490,7 +496,7 @@ class Stake extends Component {
             className={ classes.stakeButton }
             variant="outlined"
             color="secondary"
-            disabled={ loading }
+            disabled={ (pool.id === 'Governance' ? (loading || voteLockValid ) : loading  ) }
             onClick={ () => { this.onUnstake() } }
           >
             <Typography variant={ 'h4'}>Unstake</Typography>
