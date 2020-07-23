@@ -181,7 +181,7 @@ class Proposal extends Component {
           <Typography variant={ 'h5' } className={ classes.grey }>Vote Start Block</Typography>
         </div>
         <div className={classes.heading}>
-          <Typography variant={ 'h3' }>~{ moment(startTime).format("YYYY/MM/DD hh:mm") }</Typography>
+          <Typography variant={ 'h3' }>~{ moment(startTime).format("YYYY/MM/DD kk:mm") }</Typography>
           <Typography variant={ 'h5' } className={ classes.grey }>Vote Start Time</Typography>
         </div>
         <div className={classes.heading}>
@@ -189,7 +189,7 @@ class Proposal extends Component {
           <Typography variant={ 'h5' } className={ classes.grey }>Vote End Block</Typography>
         </div>
         <div className={classes.heading}>
-          <Typography variant={ 'h3' }>~{ moment(endTime).format("YYYY/MM/DD hh:mm") }</Typography>
+          <Typography variant={ 'h3' }>~{ moment(endTime).format("YYYY/MM/DD kk:mm") }</Typography>
           <Typography variant={ 'h5' } className={ classes.grey }>Vote End Time</Typography>
         </div>
       </div>
