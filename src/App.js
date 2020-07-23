@@ -25,8 +25,8 @@ import {
   CONNECTION_DISCONNECTED,
   CONFIGURE,
   CONFIGURE_RETURNED,
-  GET_BALANCES,
-  GET_BALANCES_RETURNED
+  GET_BALANCES_PERPETUAL,
+  GET_BALANCES_PERPETUAL_RETURNED
 } from './constants'
 
 import Store from "./stores";
@@ -48,23 +48,24 @@ class App extends Component {
     emitter.on(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
     emitter.on(CONFIGURE_RETURNED, this.configureReturned);
-    emitter.on(GET_BALANCES_RETURNED, this.getBalancesReturned);
+    emitter.on(GET_BALANCES_PERPETUAL_RETURNED, this.getBalancesReturned);
   }
 
   componentWillUnmount() {
     emitter.removeListener(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected);
     emitter.removeListener(CONFIGURE_RETURNED, this.configureReturned);
-    emitter.removeListener(GET_BALANCES_RETURNED, this.getBalancesReturned);
+    emitter.removeListener(GET_BALANCES_PERPETUAL_RETURNED, this.getBalancesReturned);
   };
 
   getBalancesReturned = () => {
-    const pools = store.getStore('rewardPools')
-    console.log(pools)
+    window.setTimeout(() => {
+      dispatcher.dispatch({ type: GET_BALANCES_PERPETUAL, content: {} })
+    }, 15000)
   }
 
   configureReturned = () => {
-    dispatcher.dispatch({ type: GET_BALANCES, content: {} })
+    dispatcher.dispatch({ type: GET_BALANCES_PERPETUAL, content: {} })
   }
 
   connectionConnected = () => {

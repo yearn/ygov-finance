@@ -31,7 +31,8 @@ import {
   EXIT,
   EXIT_RETURNED,
   GET_YCRV_REQUIREMENTS,
-  GET_YCRV_REQUIREMENTS_RETURNED
+  GET_YCRV_REQUIREMENTS_RETURNED,
+  GET_BALANCES_RETURNED
 } from '../../constants'
 
 const styles = theme => ({
@@ -266,6 +267,7 @@ class Stake extends Component {
     emitter.on(EXIT_RETURNED, this.showHash);
     emitter.on(GET_REWARDS_RETURNED, this.showHash);
     emitter.on(GET_YCRV_REQUIREMENTS_RETURNED, this.yCrvRequirementsReturned);
+    emitter.on(GET_BALANCES_RETURNED, this.balancesReturned);
   }
 
   componentWillUnmount() {
@@ -275,7 +277,21 @@ class Stake extends Component {
     emitter.removeListener(EXIT_RETURNED, this.showHash);
     emitter.removeListener(GET_REWARDS_RETURNED, this.showHash);
     emitter.removeListener(GET_YCRV_REQUIREMENTS_RETURNED, this.yCrvRequirementsReturned);
+    emitter.removeListener(GET_BALANCES_RETURNED, this.balancesReturned);
   };
+
+  balancesReturned = () => {
+    const currentPool = store.getStore('currentPool')
+    const pools = store.getStore('rewardPools')
+    let newPool = pools.filter((pool) => {
+      return pool.id === currentPool.id
+    })
+
+    if(newPool.length > 0) {
+      newPool = newPool[0]
+      store.setStore({ currentPool: newPool })
+    }
+  }
 
   yCrvRequirementsReturned = (requirements) => {
     this.setState({

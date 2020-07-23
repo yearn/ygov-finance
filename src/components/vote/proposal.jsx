@@ -13,7 +13,8 @@ import {
   VOTE_FOR,
   VOTE_FOR_RETURNED,
   VOTE_AGAINST,
-  VOTE_AGAINST_RETURNED
+  VOTE_AGAINST_RETURNED,
+  GET_BALANCES_RETURNED
 } from '../../constants'
 
 import Store from "../../stores";
@@ -99,25 +100,35 @@ class Proposal extends Component {
   constructor() {
     super()
 
+    let now = store.getStore('currentBlock')
+
     this.state = {
       amount: '',
       amountError: false,
       redeemAmount: '',
       redeemAmountError: false,
       account: store.getStore('account'),
+      currentBlock: now
     }
   }
 
   componentWillMount() {
     emitter.on(VOTE_FOR_RETURNED, this.voteForReturned);
     emitter.on(VOTE_AGAINST_RETURNED, this.voteAgainstReturned);
+    emitter.on(GET_BALANCES_RETURNED, this.balancesUpdated);
     emitter.on(ERROR, this.errorReturned);
   }
 
   componentWillUnmount() {
     emitter.removeListener(VOTE_FOR_RETURNED, this.voteForReturned);
     emitter.removeListener(VOTE_AGAINST_RETURNED, this.voteAgainstReturned);
+    emitter.removeListener(GET_BALANCES_RETURNED, this.balancesUpdated);
     emitter.removeListener(ERROR, this.errorReturned);
+  };
+
+  balancesUpdated = () => {
+    let now = store.getStore('currentBlock')
+    this.setState({ currentBlock: now })
   };
 
   voteForReturned = () => {
@@ -133,11 +144,16 @@ class Proposal extends Component {
   };
 
   render() {
-    const { classes } = this.props;
+    const { classes, proposal } = this.props;
     const {
       account,
-      loading
+      loading,
+      currentBlock
     } = this.state
+
+    if(proposal.end < currentBlock) {
+      return <div></div>
+    }
 
     return (<div className={ classes.actionsContainer }>
       <div className={ classes.tradeContainer }>
@@ -145,7 +161,7 @@ class Proposal extends Component {
           className={ classes.actionButton }
           variant="outlined"
           color="primary"
-          disabled={ loading }
+          disabled={ loading || proposal.end < currentBlock }
           onClick={ this.onVoteFor }
           fullWidth
           >
@@ -158,7 +174,7 @@ class Proposal extends Component {
           className={ classes.actionButton }
           variant="outlined"
           color="primary"
-          disabled={ loading }
+          disabled={ loading || proposal.end < currentBlock }
           onClick={ this.onVoteAgainst }
           fullWidth
           >

@@ -242,7 +242,7 @@ class RewardPools extends Component {
       tokensList = (tokensList + ' ...')
     }
 
-    return (<div className={ classes.rewardPoolContainer} onClick={ () => { if(rewardPool.tokens.length > 0) { this.navigateStake(rewardPool) } } }>
+    return (<div className={ classes.rewardPoolContainer} key={ rewardPool.id } onClick={ () => { if(rewardPool.tokens.length > 0) { this.navigateStake(rewardPool) } } }>
       <Typography variant='h3' className={ classes.poolName }>{ rewardPool.id }</Typography>
       <Typography varian='h4' className={ classes.tokensList } align='center'>
         { rewardPool.tokens.length > 0 && "Supported Tokens: " + tokensList  }
@@ -252,9 +252,7 @@ class RewardPools extends Component {
   }
 
   navigateStake = (rewardPool) => {
-    store.setStore({
-      currentPool: rewardPool
-    })
+    store.setStore({ currentPool: rewardPool })
 
     this.props.history.push('/stake')
   }

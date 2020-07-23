@@ -7,6 +7,8 @@ import {
   CONFIGURE_RETURNED,
   GET_BALANCES,
   GET_BALANCES_RETURNED,
+  GET_BALANCES_PERPETUAL,
+  GET_BALANCES_PERPETUAL_RETURNED,
   STAKE,
   STAKE_RETURNED,
   WITHDRAW,
@@ -256,6 +258,9 @@ class Store {
           case GET_BALANCES:
             this.getBalances(payload);
             break;
+          case GET_BALANCES_PERPETUAL:
+            this.getBalancesPerpetual(payload);
+            break;
           case STAKE:
             this.stake(payload);
             break;
@@ -318,6 +323,56 @@ class Store {
     window.setTimeout(() => {
       emitter.emit(CONFIGURE_RETURNED)
     }, 100)
+  }
+
+  getBalancesPerpetual = async () => {
+    const pools = store.getStore('rewardPools')
+    const account = store.getStore('account')
+
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    const currentBlock = await web3.eth.getBlockNumber()
+    store.setStore({ currentBlock: currentBlock })
+
+    async.map(pools, (pool, callback) => {
+
+      async.map(pool.tokens, (token, callbackInner) => {
+
+        async.parallel([
+          (callbackInnerInner) => { this._getERC20Balance(web3, token, account, callbackInnerInner) },
+          (callbackInnerInner) => { this._getstakedBalance(web3, token, account, callbackInnerInner) },
+          (callbackInnerInner) => { this._getRewardsAvailable(web3, token, account, callbackInnerInner) }
+        ], (err, data) => {
+          if(err) {
+            console.log(err)
+            return callbackInner(err)
+          }
+
+          token.balance = data[0]
+          token.stakedBalance = data[1]
+          token.rewardsAvailable = data[2]
+
+          callbackInner(null, token)
+        })
+      }, (err, tokensData) => {
+        if(err) {
+          console.log(err)
+          return callback(err)
+        }
+
+        pool.tokens = tokensData
+        callback(null, pool)
+      })
+
+    }, (err, poolData) => {
+      if(err) {
+        console.log(err)
+        return emitter.emit(ERROR, err)
+      }
+      store.setStore({rewardPools: poolData})
+      emitter.emit(GET_BALANCES_PERPETUAL_RETURNED)
+      emitter.emit(GET_BALANCES_RETURNED)
+    })
   }
 
   getBalances = () => {
