@@ -401,6 +401,14 @@ class Vote extends Component {
                 <Typography variant={ 'h3' }>{ proposal.totalAgainstVotes ? (parseFloat(proposal.totalAgainstVotes)/10**18).toLocaleString(undefined, { maximumFractionDigits: 4, minimumFractionDigits: 4 }) : 0 }</Typography>
                 <Typography variant={ 'h5' } className={ classes.grey }>Votes Against { ((parseFloat(proposal.totalAgainstVotes)/10**18) / ((parseFloat(proposal.totalForVotes)/10**18) + (parseFloat(proposal.totalAgainstVotes)/10**18)) * 100).toFixed(2) }%</Typography>
               </div>
+              {/*<div className={classes.heading}>
+                <Typography variant={ 'h3' }>{ proposal.start }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>Vote Starts</Typography>
+              </div>
+              <div className={classes.heading}>
+                <Typography variant={ 'h3' }>{ proposal.end }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>Vote Ends</Typography>
+              </div>*/}
             </div>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
@@ -463,4 +471,3 @@ class Vote extends Component {
 }
 
 export default withRouter(withStyles(styles)(Vote));
-

@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import * as moment from 'moment';
 import { withRouter } from "react-router-dom";
 import { withStyles } from '@material-ui/core/styles';
 import {
@@ -16,6 +17,8 @@ import {
   VOTE_AGAINST_RETURNED,
   GET_BALANCES_RETURNED
 } from '../../constants'
+
+import { colors } from '../../theme'
 
 import Store from "../../stores";
 const emitter = Store.emitter
@@ -41,6 +44,7 @@ const styles = theme => ({
     paddingBottom: '12px',
     display: 'flex',
     flex: '1',
+    flexWrap: 'wrap',
   },
   title: {
     paddingRight: '24px'
@@ -82,16 +86,23 @@ const styles = theme => ({
     }
   },
   heading: {
-    paddingBottom: '12px',
-    flex: 1,
-    flexShrink: 0,
-    [theme.breakpoints.up('sm')]: {
-      display: 'none',
-    }
+    paddingBottom: '40px',
+    flexShrink: 0
   },
   right: {
     textAlign: 'right'
-  }
+  },
+  assetSummary: {
+    display: 'flex',
+    alignItems: 'center',
+    flex: 1,
+    minWidth: '100%',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between'
+  },
+  grey: {
+    color: colors.darkGray
+  },
 });
 
 
@@ -108,7 +119,8 @@ class Proposal extends Component {
       redeemAmount: '',
       redeemAmountError: false,
       account: store.getStore('account'),
-      currentBlock: now
+      currentBlock: now,
+      currentTime: new Date().getTime()
     }
   }
 
@@ -148,14 +160,39 @@ class Proposal extends Component {
     const {
       account,
       loading,
-      currentBlock
+      currentBlock,
+      currentTime
     } = this.state
 
     if(proposal.end < currentBlock) {
       return <div></div>
     }
 
+    const blocksTillEnd = proposal.end - currentBlock
+    const blocksSinceStart = currentBlock - proposal.start
+
+    const endTime = currentTime + (blocksTillEnd * 1000 * 13.8)
+    const startTime = currentTime - (blocksSinceStart * 1000 * 13.8)
+
     return (<div className={ classes.actionsContainer }>
+      <div className={ classes.assetSummary }>
+        <div className={classes.heading}>
+          <Typography variant={ 'h3' }>{ proposal.start }</Typography>
+          <Typography variant={ 'h5' } className={ classes.grey }>Vote Start Block</Typography>
+        </div>
+        <div className={classes.heading}>
+          <Typography variant={ 'h3' }>~{ moment(startTime).format("YYYY/MM/DD hh:mm") }</Typography>
+          <Typography variant={ 'h5' } className={ classes.grey }>Vote Start Time</Typography>
+        </div>
+        <div className={classes.heading}>
+          <Typography variant={ 'h3' }>{ proposal.end }</Typography>
+          <Typography variant={ 'h5' } className={ classes.grey }>Vote End Block</Typography>
+        </div>
+        <div className={classes.heading}>
+          <Typography variant={ 'h3' }>~{ moment(endTime).format("YYYY/MM/DD hh:mm") }</Typography>
+          <Typography variant={ 'h5' } className={ classes.grey }>Vote End Time</Typography>
+        </div>
+      </div>
       <div className={ classes.tradeContainer }>
         <Button
           className={ classes.actionButton }
