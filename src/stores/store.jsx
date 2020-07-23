@@ -115,7 +115,8 @@ class Store {
         {
           id: 'yearn',
           name: 'yearn.finance',
-          website: 'https://yearn.finance',
+          website: 'y.curve.fi',
+          link: 'https://y.curve.fi',
           tokens: [
             {
               id: 'ycurvefi',
@@ -136,7 +137,8 @@ class Store {
         {
           id: 'balancer',
           name: 'Balancer Pool',
-          website: 'https://balancer.exchange/',
+          website: 'pools.balancer.exchange',
+          link: 'https://pools.balancer.exchange/#/pool/0x60626db611a9957C1ae4Ac5b7eDE69e24A3B76c5',
           tokens: [
             {
               id: 'bpt',
@@ -157,7 +159,8 @@ class Store {
         {
           id: 'Governance',
           name: 'Governance',
-          website: 'https://ygov.finance/',
+          website: 'pools.balancer.exchange',
+          link: 'https://pools.balancer.exchange/#/pool/0x95c4b6c7cff608c0ca048df8b81a484aa377172b',
           tokens: [
             {
               id: 'bpt',
@@ -178,7 +181,8 @@ class Store {
         {
           id: 'Fee Rewards',
           name: 'Fee Rewards',
-          website: 'https://ygov.finance/',
+          website: 'ygov.finance',
+          link: 'https://ygov.finance/',
           tokens: [
             {
               id: 'yfi',
@@ -195,58 +199,7 @@ class Store {
               rewardsAvailable: 0
             }
           ]
-        },
-        {
-          id: 'yswap',
-          name: 'yswap.finance',
-          website: 'https://yswap.finance',
-          tokens: [
-            // {
-            //   id: 'aunidai',
-            //   address: '0x048930eec73c91B44b0844aEACdEBADC2F2b6efb',
-            //   symbol: 'aUniDAI',
-            //   abi: config.erc20ABI,
-            //   rewardsAddress: config.yCurveFiRewardsAddress,
-            //   rewardsABI: config.yCurveFiRewardsABI,
-            //   decimals: 18,
-            //   balance: 0,
-            //   stakedBalance: 0,
-            //   rewardsAvailable: 0
-            // }
-          ]
-        },
-        {
-          id: 'ytrade',
-          name: 'ytrade.finance',
-          website: 'https://ytrade.finance',
-          tokens: [
-
-          ]
-        },
-        // {
-        //   id: 'iliquidate',
-        //   name: 'iliquidate.finance',
-        //   website: 'https://iliquidate.finance',
-        //   tokens: [
-        //
-        //   ]
-        // },
-        // {
-        //   id: 'ileverage',
-        //   name: 'ileverage.finance',
-        //   website: 'https://ileverage.finance',
-        //   tokens: [
-        //
-        //   ]
-        // },
-        // {
-        //   id: 'ipool',
-        //   name: 'ipool.finance',
-        //   website: 'https://ipool.finance',
-        //   tokens: [
-        //
-        //   ]
-        // }
+        }
       ]
     }
 

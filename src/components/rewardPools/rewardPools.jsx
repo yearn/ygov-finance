@@ -24,7 +24,7 @@ const styles = theme => ({
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
-    maxWidth: '900px',
+    maxWidth: '600px',
     width: '100%',
     justifyContent: 'flex-start',
     alignItems: 'center',
@@ -126,7 +126,6 @@ const styles = theme => ({
     justifyContent: 'center',
     alignItems: 'center',
     flex: 1,
-    cursor: 'pointer',
     padding: '28px 30px',
     borderRadius: '50px',
     border: '1px solid '+colors.borderBlue,
@@ -146,7 +145,13 @@ const styles = theme => ({
     color: colors.text
   },
   tokensList: {
-    color: colors.darkGray
+    color: colors.darkGray,
+    paddingBottom: '20px',
+  },
+  poolWebsite: {
+    color: colors.darkGray,
+    paddingBottom: '20px',
+    textDecoration: 'none'
   }
 })
 
@@ -242,12 +247,20 @@ class RewardPools extends Component {
       tokensList = (tokensList + ' ...')
     }
 
-    return (<div className={ classes.rewardPoolContainer} key={ rewardPool.id } onClick={ () => { if(rewardPool.tokens.length > 0) { this.navigateStake(rewardPool) } } }>
+    return (<div className={ classes.rewardPoolContainer} key={ rewardPool.id } >
       <Typography variant='h3' className={ classes.poolName }>{ rewardPool.id }</Typography>
+      <Typography variant='h5' className={ classes.poolWebsite }><a href={ rewardPool.link } target="_blank">{ rewardPool.website }</a></Typography>
       <Typography varian='h4' className={ classes.tokensList } align='center'>
         { rewardPool.tokens.length > 0 && "Supported Tokens: " + tokensList  }
         { rewardPool.tokens.length == 0 && "No supported tokens currently"  }
       </Typography>
+      <Button
+        variant="outlined"
+        color="secondary"
+        onClick={ () => { if(rewardPool.tokens.length > 0) { this.navigateStake(rewardPool) } } }
+      >
+        <Typography variant={ 'h4'}>Open</Typography>
+      </Button>
     </div>)
   }
 
