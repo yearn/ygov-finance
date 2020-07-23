@@ -50,6 +50,7 @@ import {
   authereum
 } from "./connectors";
 
+const rp = require('request-promise');
 const ethers = require('ethers');
 
 const Dispatcher = require('flux').Dispatcher;
@@ -431,7 +432,7 @@ class Store {
       const ethAllowance = web3.utils.fromWei(allowance, "ether")
 
       if(parseFloat(ethAllowance) < parseFloat(amount)) {
-        await erc20Contract.methods.approve(contract, web3.utils.toWei("999999999999999", "ether")).send({ from: account.address, gasPrice: web3.utils.toWei(store.getStore('universalGasPrice'), 'gwei') })
+        await erc20Contract.methods.approve(contract, web3.utils.toWei("999999999999999", "ether")).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
         callback()
       } else {
         callback()
@@ -453,7 +454,7 @@ class Store {
     const ethAllowance = web3.utils.fromWei(allowance, "ether")
 
     if(parseFloat(ethAllowance) < parseFloat(amount)) {
-      erc20Contract.methods.approve(contract, web3.utils.toWei("999999999999999", "ether")).send({ from: account.address, gasPrice: web3.utils.toWei(store.getStore('universalGasPrice'), 'gwei') })
+      erc20Contract.methods.approve(contract, web3.utils.toWei("999999999999999", "ether")).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
         .on('transactionHash', function(hash){
           callback()
         })
@@ -525,10 +526,10 @@ class Store {
     let erc20Contract = new web3.eth.Contract(config.erc20ABI, (overwriteAddress ? overwriteAddress : asset.address))
     try {
       if(last) {
-        await erc20Contract.methods.approve(contract, web3.utils.toWei("999999999999999", "ether")).send({ from: account.address, gasPrice: web3.utils.toWei(store.getStore('universalGasPrice'), 'gwei') })
+        await erc20Contract.methods.approve(contract, web3.utils.toWei("999999999999999", "ether")).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
         callback()
       } else {
-        erc20Contract.methods.approve(contract, web3.utils.toWei("999999999999999", "ether")).send({ from: account.address, gasPrice: web3.utils.toWei(store.getStore('universalGasPrice'), 'gwei') })
+        erc20Contract.methods.approve(contract, web3.utils.toWei("999999999999999", "ether")).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
           .on('transactionHash', function(hash){
             callback()
           })
@@ -568,7 +569,7 @@ class Store {
     })
   }
 
-  _callStake = (asset, account, amount, callback) => {
+  _callStake = async (asset, account, amount, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
     const yCurveFiContract = new web3.eth.Contract(asset.rewardsABI, asset.rewardsAddress)
@@ -578,7 +579,7 @@ class Store {
       amountToSend = (amount*10**asset.decimals).toFixed(0);
     }
 
-    yCurveFiContract.methods.stake(amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei(store.getStore('universalGasPrice'), 'gwei') })
+    yCurveFiContract.methods.stake(amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
       .on('transactionHash', function(hash){
         console.log(hash)
         callback(null, hash)
@@ -623,7 +624,7 @@ class Store {
     })
   }
 
-  _callWithdraw = (asset, account, amount, callback) => {
+  _callWithdraw = async (asset, account, amount, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
     const yCurveFiContract = new web3.eth.Contract(asset.rewardsABI, asset.rewardsAddress)
@@ -633,7 +634,7 @@ class Store {
       amountToSend = (amount*10**asset.decimals).toFixed(0);
     }
 
-    yCurveFiContract.methods.withdraw(amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei(store.getStore('universalGasPrice'), 'gwei') })
+    yCurveFiContract.methods.withdraw(amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
       .on('transactionHash', function(hash){
         console.log(hash)
         callback(null, hash)
@@ -678,12 +679,12 @@ class Store {
     })
   }
 
-  _callGetReward = (asset, account, callback) => {
+  _callGetReward = async (asset, account, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
     const yCurveFiContract = new web3.eth.Contract(asset.rewardsABI, asset.rewardsAddress)
 
-    yCurveFiContract.methods.getReward().send({ from: account.address, gasPrice: web3.utils.toWei(store.getStore('universalGasPrice'), 'gwei') })
+    yCurveFiContract.methods.getReward().send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
       .on('transactionHash', function(hash){
         console.log(hash)
         callback(null, hash)
@@ -728,12 +729,12 @@ class Store {
     })
   }
 
-  _callExit = (asset, account, callback) => {
+  _callExit = async (asset, account, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
     const yCurveFiContract = new web3.eth.Contract(asset.rewardsABI, asset.rewardsAddress)
 
-    yCurveFiContract.methods.exit().send({ from: account.address, gasPrice: web3.utils.toWei(store.getStore('universalGasPrice'), 'gwei') })
+    yCurveFiContract.methods.exit().send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
       .on('transactionHash', function(hash){
         console.log(hash)
         callback(null, hash)
@@ -777,12 +778,12 @@ class Store {
     })
   }
 
-  _callPropose = (account, callback) => {
+  _callPropose = async (account, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
     const governanceContract = new web3.eth.Contract(config.governanceABI, config.governanceAddress)
 
-    governanceContract.methods.propose().send({ from: account.address, gasPrice: web3.utils.toWei(store.getStore('universalGasPrice'), 'gwei') })
+    governanceContract.methods.propose().send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
       .on('transactionHash', function(hash){
         console.log(hash)
         callback(null, hash)
@@ -877,12 +878,12 @@ class Store {
     })
   }
 
-  _callVoteFor = (proposal, account, callback) => {
+  _callVoteFor = async (proposal, account, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
     const governanceContract = new web3.eth.Contract(config.governanceABI, config.governanceAddress)
 
-    governanceContract.methods.voteFor(proposal.id).send({ from: account.address, gasPrice: web3.utils.toWei(store.getStore('universalGasPrice'), 'gwei') })
+    governanceContract.methods.voteFor(proposal.id).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
       .on('transactionHash', function(hash){
         console.log(hash)
         callback(null, hash)
@@ -927,12 +928,12 @@ class Store {
     })
   }
 
-  _callVoteAgainst = (proposal, account, callback) => {
+  _callVoteAgainst = async (proposal, account, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
     const governanceContract = new web3.eth.Contract(config.governanceABI, config.governanceAddress)
 
-    governanceContract.methods.voteAgainst(proposal.id).send({ from: account.address, gasPrice: web3.utils.toWei(store.getStore('universalGasPrice'), 'gwei') })
+    governanceContract.methods.voteAgainst(proposal.id).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
       .on('transactionHash', function(hash){
         console.log(hash)
         callback(null, hash)
@@ -1030,7 +1031,7 @@ class Store {
     })
   }
 
-  _callClaim = (asset, account, amount, callback) => {
+  _callClaim = async (asset, account, amount, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
     const claimContract = new web3.eth.Contract(config.claimABI, config.claimAddress)
@@ -1040,7 +1041,7 @@ class Store {
       amountToSend = (amount*10**asset.decimals).toFixed(0);
     }
 
-    claimContract.methods.claim(amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei(store.getStore('universalGasPrice'), 'gwei') })
+    claimContract.methods.claim(amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
       .on('transactionHash', function(hash){
         console.log(hash)
         callback(null, hash)
@@ -1116,6 +1117,21 @@ class Store {
 
     } catch(ex) {
       return emitter.emit(ERROR, ex);
+    }
+  }
+
+  _getGasPrice = async () => {
+    try {
+      const url = 'https://fees.upvest.co/estimate_eth_fees'
+      const priceString = await rp(url);
+      const priceJSON = JSON.parse(priceString)
+      if(priceJSON && priceJSON.estimates) {
+        return priceJSON.estimates.fast.toFixed(0)
+      }
+      return store.getStore('universalGasPrice')
+    } catch(e) {
+      console.log(e)
+      return store.getStore('universalGasPrice')
     }
   }
 }
