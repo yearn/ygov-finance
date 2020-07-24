@@ -334,6 +334,7 @@ class Vote extends Component {
           <div className={ classes.between }>
           </div>
           <div className={ classes.proposalContainer }>
+            {/*
             <Button
               className={ classes.stakeButton }
               variant="outlined"
@@ -343,6 +344,7 @@ class Vote extends Component {
             >
               <Typography variant={ 'h4'}>Generate a new proposal</Typography>
             </Button>
+            */}
           </div>
         </div>
         { this.renderProposals() }
