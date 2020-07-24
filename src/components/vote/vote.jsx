@@ -395,11 +395,11 @@ class Vote extends Component {
               </div>
               <div className={classes.heading}>
                 <Typography variant={ 'h3' }>{ proposal.totalForVotes ? (parseFloat(proposal.totalForVotes)/10**18).toLocaleString(undefined, { maximumFractionDigits: 4, minimumFractionDigits: 4 }) : 0 }</Typography>
-                <Typography variant={ 'h5' } className={ classes.grey }>Votes For { ((parseFloat(proposal.totalForVotes)/10**18) / ((parseFloat(proposal.totalForVotes)/10**18) + (parseFloat(proposal.totalAgainstVotes)/10**18)) * 100).toFixed(2) }%</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>Votes For { proposal.totalForVotes !== "0" ? ((parseFloat(proposal.totalForVotes)/10**18) / ((parseFloat(proposal.totalForVotes)/10**18) + (parseFloat(proposal.totalAgainstVotes)/10**18)) * 100).toFixed(2) : 0 }%</Typography>
               </div>
               <div className={classes.heading}>
                 <Typography variant={ 'h3' }>{ proposal.totalAgainstVotes ? (parseFloat(proposal.totalAgainstVotes)/10**18).toLocaleString(undefined, { maximumFractionDigits: 4, minimumFractionDigits: 4 }) : 0 }</Typography>
-                <Typography variant={ 'h5' } className={ classes.grey }>Votes Against { ((parseFloat(proposal.totalAgainstVotes)/10**18) / ((parseFloat(proposal.totalForVotes)/10**18) + (parseFloat(proposal.totalAgainstVotes)/10**18)) * 100).toFixed(2) }%</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>Votes Against { proposal.totalAgainstVotes !== "0" ? ((parseFloat(proposal.totalAgainstVotes)/10**18) / ((parseFloat(proposal.totalForVotes)/10**18) + (parseFloat(proposal.totalAgainstVotes)/10**18)) * 100).toFixed(2) : 0 }%</Typography>
               </div>
               {/*<div className={classes.heading}>
                 <Typography variant={ 'h3' }>{ proposal.start }</Typography>
