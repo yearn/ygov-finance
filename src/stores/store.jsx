@@ -115,8 +115,8 @@ class Store {
         {
           id: 'yearn',
           name: 'yearn.finance',
-          website: 'y.curve.fi',
-          link: 'https://y.curve.fi',
+          website: 'curve.fi/y',
+          link: 'https://curve.fi/y',
           tokens: [
             {
               id: 'ycurvefi',
@@ -1075,11 +1075,11 @@ class Store {
 
   _getGasPrice = async () => {
     try {
-      const url = 'https://fees.upvest.co/estimate_eth_fees'
+      const url = 'https://gasprice.poa.network/'
       const priceString = await rp(url);
       const priceJSON = JSON.parse(priceString)
-      if(priceJSON && priceJSON.estimates) {
-        return priceJSON.estimates.fast.toFixed(0)
+      if(priceJSON) {
+        return priceJSON.fast.toFixed(0)
       }
       return store.getStore('universalGasPrice')
     } catch(e) {

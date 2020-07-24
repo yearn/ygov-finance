@@ -29,6 +29,8 @@ import {
   GET_BALANCES_PERPETUAL_RETURNED
 } from './constants'
 
+import { injected } from "./stores/connectors";
+
 import Store from "./stores";
 const emitter = Store.emitter
 const dispatcher = Store.dispatcher
@@ -49,6 +51,22 @@ class App extends Component {
     emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
     emitter.on(CONFIGURE_RETURNED, this.configureReturned);
     emitter.on(GET_BALANCES_PERPETUAL_RETURNED, this.getBalancesReturned);
+
+    injected.isAuthorized().then(isAuthorized => {
+      if (isAuthorized) {
+        injected.activate()
+        .then((a) => {
+          store.setStore({ account: { address: a.account }, web3context: { library: { provider: a.provider } } })
+          emitter.emit(CONNECTION_CONNECTED)
+          console.log(a)
+        })
+        .catch((e) => {
+          console.log(e)
+        })
+      } else {
+
+      }
+    });
   }
 
   componentWillUnmount() {
