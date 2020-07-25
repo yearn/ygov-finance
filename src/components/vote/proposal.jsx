@@ -174,8 +174,14 @@ class Proposal extends Component {
     const endTime = currentTime + (blocksTillEnd * 1000 * 13.8)
     const startTime = currentTime - (blocksSinceStart * 1000 * 13.8)
 
+    const yipURL = `https://yips.yearn.finance/YIPS/yip-${proposal.id}`;
+
     return (<div className={ classes.actionsContainer }>
       <div className={ classes.assetSummary }>
+        <div className={classes.heading}>
+          <Typography variant={ 'h3' }><a href={ yipURL } target="_blank">Here</a></Typography>
+          <Typography variant={ 'h5' } className={ classes.grey }>Link to YIP</Typography>
+        </div>
         <div className={classes.heading}>
           <Typography variant={ 'h3' }>{ proposal.start }</Typography>
           <Typography variant={ 'h5' } className={ classes.grey }>Vote Start Block</Typography>
