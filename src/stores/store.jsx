@@ -117,6 +117,7 @@ class Store {
           name: 'yearn.finance',
           website: 'curve.fi/y',
           link: 'https://curve.fi/y',
+          depositsEnabled: false,
           tokens: [
             {
               id: 'ycurvefi',
@@ -139,6 +140,7 @@ class Store {
           name: 'Balancer Pool',
           website: 'pools.balancer.exchange',
           link: 'https://pools.balancer.exchange/#/pool/0x60626db611a9957C1ae4Ac5b7eDE69e24A3B76c5',
+          depositsEnabled: false,
           tokens: [
             {
               id: 'bpt',
@@ -161,6 +163,7 @@ class Store {
           name: 'Governance',
           website: 'pools.balancer.exchange',
           link: 'https://pools.balancer.exchange/#/pool/0x95c4b6c7cff608c0ca048df8b81a484aa377172b',
+          depositsEnabled: true,
           tokens: [
             {
               id: 'bpt',
@@ -183,6 +186,7 @@ class Store {
           name: 'Fee Rewards',
           website: 'ygov.finance',
           link: 'https://ygov.finance/',
+          depositsEnabled: true,
           tokens: [
             {
               id: 'yfi',

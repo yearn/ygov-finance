@@ -402,7 +402,7 @@ class Stake extends Component {
             className={ classes.primaryButton }
             variant="outlined"
             color="primary"
-            disabled={ (pool.id === 'Fee Rewards' ?  (loading || !voteLockValid || !balanceValid) : loading) }
+            disabled={ !pool.depositsEnabled || (pool.id === 'Fee Rewards' ?  (loading || !voteLockValid || !balanceValid) : loading) }
             onClick={ () => { this.navigateInternal('stake') } }
             >
             <Typography className={ classes.stakeButtonText } variant={ 'h4'}>Stake Tokens</Typography>
