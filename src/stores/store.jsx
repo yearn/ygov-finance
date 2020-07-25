@@ -135,75 +135,75 @@ class Store {
             }
           ]
         },
-        {
-          id: 'balancer',
-          name: 'Balancer Pool',
-          website: 'pools.balancer.exchange',
-          link: 'https://pools.balancer.exchange/#/pool/0x60626db611a9957C1ae4Ac5b7eDE69e24A3B76c5',
-          depositsEnabled: false,
-          tokens: [
-            {
-              id: 'bpt',
-              address: '0x60626db611a9957C1ae4Ac5b7eDE69e24A3B76c5',
-              symbol: 'BPT',
-              abi: config.erc20ABI,
-              decimals: 18,
-              rewardsAddress: config.balancerRewardsAddress,
-              rewardsABI: config.balancerRewardsABI,
-              rewardsSymbol: 'YFI',
-              decimals: 18,
-              balance: 0,
-              stakedBalance: 0,
-              rewardsAvailable: 0
-            }
-          ]
-        },
-        {
-          id: 'Governance',
-          name: 'Governance',
-          website: 'pools.balancer.exchange',
-          link: 'https://pools.balancer.exchange/#/pool/0x95c4b6c7cff608c0ca048df8b81a484aa377172b',
-          depositsEnabled: true,
-          tokens: [
-            {
-              id: 'bpt',
-              address: '0x95c4b6c7cff608c0ca048df8b81a484aa377172b',
-              symbol: 'BPT',
-              abi: config.bpoolABI,
-              decimals: 18,
-              rewardsAddress: config.governanceAddress,
-              rewardsABI: config.governanceABI,
-              rewardsSymbol: 'YFI',
-              decimals: 18,
-              balance: 0,
-              stakedBalance: 0,
-              rewardsAvailable: 0
-            }
-          ]
-        },
-        {
-          id: 'Fee Rewards',
-          name: 'Fee Rewards',
-          website: 'ygov.finance',
-          link: 'https://ygov.finance/',
-          depositsEnabled: true,
-          tokens: [
-            {
-              id: 'yfi',
-              address: config.yfiAddress,
-              symbol: 'YFI',
-              abi: config.yfiABI,
-              decimals: 18,
-              rewardsAddress: config.feeRewardsAddress,
-              rewardsABI: config.feeRewardsABI,
-              rewardsSymbol: '$',
-              decimals: 18,
-              balance: 0,
-              stakedBalance: 0,
-              rewardsAvailable: 0
-            }
-          ]
-        }
+        // {
+        //   id: 'balancer',
+        //   name: 'Balancer Pool',
+        //   website: 'pools.balancer.exchange',
+        //   link: 'https://pools.balancer.exchange/#/pool/0x60626db611a9957C1ae4Ac5b7eDE69e24A3B76c5',
+        //   depositsEnabled: false,
+        //   tokens: [
+        //     {
+        //       id: 'bpt',
+        //       address: '0x60626db611a9957C1ae4Ac5b7eDE69e24A3B76c5',
+        //       symbol: 'BPT',
+        //       abi: config.erc20ABI,
+        //       decimals: 18,
+        //       rewardsAddress: config.balancerRewardsAddress,
+        //       rewardsABI: config.balancerRewardsABI,
+        //       rewardsSymbol: 'YFI',
+        //       decimals: 18,
+        //       balance: 0,
+        //       stakedBalance: 0,
+        //       rewardsAvailable: 0
+        //     }
+        //   ]
+        // },
+        // {
+        //   id: 'Governance',
+        //   name: 'Governance',
+        //   website: 'pools.balancer.exchange',
+        //   link: 'https://pools.balancer.exchange/#/pool/0x95c4b6c7cff608c0ca048df8b81a484aa377172b',
+        //   depositsEnabled: true,
+        //   tokens: [
+        //     {
+        //       id: 'bpt',
+        //       address: '0x95c4b6c7cff608c0ca048df8b81a484aa377172b',
+        //       symbol: 'BPT',
+        //       abi: config.bpoolABI,
+        //       decimals: 18,
+        //       rewardsAddress: config.governanceAddress,
+        //       rewardsABI: config.governanceABI,
+        //       rewardsSymbol: 'YFI',
+        //       decimals: 18,
+        //       balance: 0,
+        //       stakedBalance: 0,
+        //       rewardsAvailable: 0
+        //     }
+        //   ]
+        // },
+        // {
+        //   id: 'Fee Rewards',
+        //   name: 'Fee Rewards',
+        //   website: 'ygov.finance',
+        //   link: 'https://ygov.finance/',
+        //   depositsEnabled: true,
+        //   tokens: [
+        //     {
+        //       id: 'yfi',
+        //       address: config.yfiAddress,
+        //       symbol: 'YFI',
+        //       abi: config.yfiABI,
+        //       decimals: 18,
+        //       rewardsAddress: config.feeRewardsAddress,
+        //       rewardsABI: config.feeRewardsABI,
+        //       rewardsSymbol: '$',
+        //       decimals: 18,
+        //       balance: 0,
+        //       stakedBalance: 0,
+        //       rewardsAvailable: 0
+        //     }
+        //   ]
+        // }
       ]
     }
 
