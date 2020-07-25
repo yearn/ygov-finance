@@ -245,7 +245,6 @@ class Vote extends Component {
 
     this.state = {
       loading: false,
-      showAddressCopiedSnackbar: false,
       account: account,
       proposals: proposals,
       value: 1
