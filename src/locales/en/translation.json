@@ -98,6 +98,10 @@
   "Pool.Connect": "Connect wallet",
 
   "Balancer.Intro": "Balancer. Simple.",
-  "Balancer.Connect": "Connect wallet"
+  "Balancer.Connect": "Connect wallet",
 
+  "RewardPools.Slogan": "This project is in beta. Use at your own risk.",
+  "RewardPools.Wallet": "Wallet",
+  "RewardPools.WhichToken": "Which tokens would you like to stake?",
+  "RewardPools.Open": "Open"
 }

@@ -70,5 +70,10 @@
 
   "Zap.IWillReceive": "将收到",
   "Zap.IHave": "已有",
-  "Zap.SendAmount": "发送金额"
+  "Zap.SendAmount": "发送金额",
+  
+  "RewardPools.Slogan": "This project is in beta. Use at your own risk.",
+  "RewardPools.Wallet": "Wallet",
+  "RewardPools.WhichToken": "Which tokens would you like to stake?",
+  "RewardPools.Open": "Open"
 }

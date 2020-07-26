@@ -70,5 +70,10 @@
 
   "Zap.IWillReceive": "I will receive",
   "Zap.IHave": "I have",
-  "Zap.SendAmount": "Send amount"
+  "Zap.SendAmount": "Send amount",
+
+  "RewardPools.Slogan": "This project is in beta. Use at your own risk.",
+  "RewardPools.Wallet": "Wallet",
+  "RewardPools.WhichToken": "Which tokens would you like to stake?",
+  "RewardPools.Open": "Open"
 }
