@@ -72,8 +72,8 @@
   "Zap.IHave": "已有",
   "Zap.SendAmount": "发送金额",
   
-  "RewardPools.Slogan": "This project is in beta. Use at your own risk.",
-  "RewardPools.Wallet": "Wallet",
-  "RewardPools.WhichToken": "Which tokens would you like to stake?",
-  "RewardPools.Open": "Open"
+  "RewardPools.Slogan": "本项目处于测试阶段，请自行评估风险。",
+  "RewardPools.Wallet": "钱包",
+  "RewardPools.WhichToken": "您希望抵押哪种代币?",
+  "RewardPools.Open": "打开"
 }

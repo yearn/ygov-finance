@@ -24,7 +24,7 @@ i18n
   .use(reactI18nextModule) // passes i18n down to react-i18next
   .init({
     resources,
-    lng: "en",
+    // lng: "en",
     fallbackLng: "en",
 
     keySeparator: false, // we do not use keys in form messages.welcome

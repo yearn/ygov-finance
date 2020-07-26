@@ -170,7 +170,8 @@ class RewardPools extends Component {
     this.state = {
       rewardPools: rewardPools,
       loading: !(account && rewardPools),
-      account: account
+      account: account,
+      
     }
 
     dispatcher.dispatch({ type: GET_BALANCES, content: {} })
@@ -196,7 +197,7 @@ class RewardPools extends Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, t } = this.props;
     const {
       value,
       account,
@@ -211,16 +212,16 @@ class RewardPools extends Component {
 
     return (
       <div className={ classes.root }>
-        <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
+        <Typography variant={'h5'} className={ classes.disaclaimer }>{t('RewardPools.Slogan')}</Typography>
         <div className={ classes.intro }>
           <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
-            <Typography variant={ 'h3'} className={ classes.walletTitle } noWrap>Wallet</Typography>
+            <Typography variant={ 'h3'} className={ classes.walletTitle } noWrap>{t('RewardPools.Wallet')}</Typography>
             <Typography variant={ 'h4'} className={ classes.walletAddress } noWrap>{ address }</Typography>
             <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}></div>
           </Card>
         </div>
         <div className={ classes.rewardPools }>
-          <Typography variant={ 'h3'} className={ classes.title } noWrap>Which tokens would you like to stake?</Typography>
+          <Typography variant={ 'h3'} className={ classes.title } noWrap>{t('RewardPools.WhichToken')}</Typography>
           {
             this.renderRewards()
           }
@@ -240,7 +241,7 @@ class RewardPools extends Component {
 
   renderRewardPool = (rewardPool) => {
 
-    const { classes } = this.props
+    const { classes, t } = this.props
 
     let tokensList = rewardPool.tokens.map((rp) => { return rp.symbol }).join(', ')
     if(tokensList.length > 2) {
@@ -259,7 +260,7 @@ class RewardPools extends Component {
         color="secondary"
         onClick={ () => { if(rewardPool.tokens.length > 0) { this.navigateStake(rewardPool) } } }
       >
-        <Typography variant={ 'h4'}>Open</Typography>
+        <Typography variant={ 'h4'}>{t('RewardPools.Open')}</Typography>
       </Button>
     </div>)
   }
@@ -286,4 +287,4 @@ class RewardPools extends Component {
 
 }
 
-export default withRouter(withStyles(styles)(RewardPools));
+export default withNamespaces()(withRouter(withStyles(styles)(RewardPools)));
