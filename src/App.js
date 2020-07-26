@@ -134,10 +134,10 @@ class App extends Component {
                   <Footer />
                   <RewardsPools />
                 </Route>
-                <Route path="/vote">
+                {/* <Route path="/vote">
                   <Footer />
                   <Vote />
-                </Route>
+                </Route> */}
                 {/*<Route path="/claim">
                   <Footer />
                   <Claim />
