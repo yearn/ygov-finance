@@ -127,7 +127,7 @@ class Store {
               decimals: 18,
               rewardsAddress: config.yCurveFiRewardsAddress,
               rewardsABI: config.yCurveFiRewardsABI,
-              rewardsSymbol: 'YFI',
+              rewardsSymbol: 'YFII',
               decimals: 18,
               balance: 0,
               stakedBalance: 0,
