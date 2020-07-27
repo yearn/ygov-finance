@@ -3,6 +3,7 @@ import { withRouter } from "react-router-dom";
 import { withStyles } from '@material-ui/core/styles';
 import {
   Typography,
+  Box,
   Button,
   Card,
   TextField,
@@ -18,6 +19,7 @@ import Loader from '../loader'
 import Snackbar from '../snackbar'
 import UnlockModal from '../unlock/unlockModal.jsx'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import CopyIcon from '@material-ui/icons/FileCopy';
 import Proposal from './proposal'
 
 import Store from "../../stores";
@@ -215,6 +217,17 @@ const styles = theme => ({
   },
   stakeButton: {
     minWidth: '300px'
+  },
+  proposerAddressContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    '& > svg': {
+      visibility: 'hidden',
+    }, 
+    '&:hover > svg': {
+      visibility: 'visible'
+    }
   }
 })
 
@@ -268,13 +281,21 @@ class Vote extends Component {
   }
 
   showHash = (txHash) => {
+    this.showSnackbar(txHash, 'Hash')
+  };
+
+  showAddressCopiedSnack = () => {
+    this.showSnackbar("Address Copied to Clipboard", 'Success')
+  }
+
+  showSnackbar = (message, type) => {
     this.setState({ snackbarMessage: null, snackbarType: null, loading: false })
     const that = this
     setTimeout(() => {
-      const snackbarObj = { snackbarMessage: txHash, snackbarType: 'Hash' }
+      const snackbarObj = { snackbarMessage: message, snackbarType: type }
       that.setState(snackbarObj)
     })
-  };
+  }
 
   configureReturned = () => {
     this.setState({ loading: false })
@@ -389,7 +410,11 @@ class Vote extends Component {
                   <Typography variant={ 'h3' }>{ proposal.id }</Typography>
                 </div>
                 <div>
-                  <Typography variant={ 'h3' }>{ address }</Typography>
+                  <div className={ classes.proposerAddressContainer }>
+                    <Typography variant={'h3'}>{address}</Typography>
+                    <Box ml={1} />
+                    <CopyIcon onClick={(e) => { this.copyAddressToClipboard(e, proposal.proposer) } } fontSize="small" />
+                  </div>
                   <Typography variant={ 'h5' } className={ classes.grey }>Proposer</Typography>
                 </div>
               </div>
@@ -433,6 +458,13 @@ class Vote extends Component {
 
   handleChange = (id) => {
     this.setState({ expanded: this.state.expanded === id ? null : id })
+  }
+
+  copyAddressToClipboard = (event, address) => {
+    event.stopPropagation();
+    navigator.clipboard.writeText(address).then(() => {
+      this.showAddressCopiedSnack();
+    });
   }
 
   onChange = (event) => {
