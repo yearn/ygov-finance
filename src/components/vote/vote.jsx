@@ -447,7 +447,7 @@ class Vote extends Component {
             </div>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
-            <Proposal proposal={ proposal } startLoading={ this.startLoading } />
+            <Proposal proposal={ proposal } startLoading={ this.startLoading } showSnackbar={ this.showSnackbar } />
           </ExpansionPanelDetails>
         </ExpansionPanel>
       )
@@ -484,8 +484,9 @@ class Vote extends Component {
   }
 
   onPropose = () => {
-    this.setState({ loading: true })
-    dispatcher.dispatch({ type: PROPOSE, content: {  } })
+    // this.setState({ loading: true })
+    // dispatcher.dispatch({ type: PROPOSE, content: {  } })
+    this.props.history.push('propose')
   }
 
   renderModal = () => {

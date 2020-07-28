@@ -16,7 +16,7 @@ import Home from './components/home';
 import Stake from './components/stake';
 import RewardsPools from './components/rewardPools';
 import Header from './components/header';
-// import Propose from './components/propose';
+import Propose from './components/propose';
 import Claim from './components/claim';
 import Vote from './components/vote';
 import VersionToggle from './components/versionToggle';
@@ -141,10 +141,11 @@ class App extends Component {
                   <Footer />
                   <Vote />
                 </Route>
-                {/*<Route path="/claim">
+                <Route path="/propose">
+                  <VersionToggle />
                   <Footer />
-                  <Claim />
-                </Route>*/}
+                  <Propose />
+                </Route>
                 <Route path="/">
                   <Home />
                 </Route>

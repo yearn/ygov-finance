@@ -5,7 +5,8 @@ import { withStyles } from '@material-ui/core/styles';
 import {
   Typography,
   TextField,
-  Button
+  Button,
+  Box,
 } from '@material-ui/core';
 import { withNamespaces } from 'react-i18next';
 
@@ -18,6 +19,7 @@ import {
   GET_BALANCES_RETURNED
 } from '../../constants'
 
+import CopyIcon from '@material-ui/icons/FileCopy';
 import { colors } from '../../theme'
 
 import Store from "../../stores";
@@ -27,6 +29,12 @@ const store = Store.store
 
 
 const styles = theme => ({
+  root: {
+    display: 'flex',
+    width: '100%',
+    flexDirection: 'column',
+    padding: '0px 36px 0px 18px'
+  },
   value: {
     cursor: 'pointer'
   },
@@ -86,7 +94,10 @@ const styles = theme => ({
     }
   },
   heading: {
-    paddingBottom: '40px',
+    flexShrink: 0
+  },
+  YIPheading: {
+    width: '64px',
     flexShrink: 0
   },
   right: {
@@ -96,13 +107,35 @@ const styles = theme => ({
     display: 'flex',
     alignItems: 'center',
     flex: 1,
-    minWidth: '100%',
     flexWrap: 'wrap',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    paddingBottom: '24px',
   },
   grey: {
     color: colors.darkGray
   },
+  headingName: {
+    flex: 2,
+    flexShrink: 0,
+    display: 'flex',
+    alignItems: 'center',
+    minWidth: '100%',
+    [theme.breakpoints.up('sm')]: {
+      minWidth: 'auto',
+    }
+  },
+  proposerAddressContainer: {
+    cursor: 'pointer',
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    '& > svg': {
+      visibility: 'hidden',
+    },
+    '&:hover > svg': {
+      visibility: 'visible'
+    }
+  }
 });
 
 
@@ -164,10 +197,6 @@ class Proposal extends Component {
       currentTime
     } = this.state
 
-    if(proposal.end < currentBlock) {
-      return <div></div>
-    }
-
     const blocksTillEnd = proposal.end - currentBlock
     const blocksSinceStart = currentBlock - proposal.start
 
@@ -176,56 +205,94 @@ class Proposal extends Component {
 
     const yipURL = `https://yips.yearn.finance/YIPS/yip-${proposal.id}`;
 
-    return (<div className={ classes.actionsContainer }>
-      <div className={ classes.assetSummary }>
-        <div className={classes.heading}>
-          <Typography variant={ 'h3' }><a href={ yipURL } target="_blank">Here</a></Typography>
-          <Typography variant={ 'h5' } className={ classes.grey }>Link to YIP</Typography>
+    var address = null;
+    if (proposal.executor) {
+      address = proposal.executor.substring(0,8)+'...'+proposal.executor.substring(proposal.executor.length-6,proposal.executor.length)
+    }
+
+    const hashURL = 'https://ipfs.io/ipfs/'+proposal.hash
+
+    return (
+      <div className={ classes.root }>
+        <div className={ classes.assetSummary }>
+          <div className={ classes.headingName }>
+            <div className={classes.YIPheading}>
+              <Typography variant={ 'h3' }><a href={ yipURL } target="_blank">YIP</a></Typography>
+              <Typography variant={ 'h5' } className={ classes.grey }>Link</Typography>
+            </div>
+            <div>
+              <div className={ classes.proposerAddressContainer }>
+                <Typography variant={'h3'}>{address}</Typography>
+                <Box ml={1} />
+                <CopyIcon onClick={(e) => { this.copyAddressToClipboard(e, proposal.executor) } } fontSize="small" />
+              </div>
+              <Typography variant={ 'h5' } className={ classes.grey }>Executor</Typography>
+            </div>
+          </div>
+          <div className={classes.heading}>
+            <Typography variant={ 'h3' }>~{ moment(startTime).format("YYYY/MM/DD kk:mm") }</Typography>
+            <Typography variant={ 'h5' } className={ classes.grey }>Vote Start: {proposal.start}</Typography>
+          </div>
         </div>
-        <div className={classes.heading}>
-          <Typography variant={ 'h3' }>{ proposal.start }</Typography>
-          <Typography variant={ 'h5' } className={ classes.grey }>Vote Start Block</Typography>
+        <div className={ classes.assetSummary }>
+          <div className={ classes.headingName }>
+            <div className={classes.YIPheading}>
+              <Typography variant={ 'h3' }><a href={ hashURL } target="_blank">IPFS</a></Typography>
+              <Typography variant={ 'h5' } className={ classes.grey }>Link</Typography>
+            </div>
+            <div>
+              <Typography variant={ 'h3' }>{ proposal.quorum } / { proposal.quorumRequired }</Typography>
+              <Typography variant={ 'h5' } className={ classes.grey }>Quorum/Required</Typography>
+            </div>
+          </div>
+          <div className={classes.heading}>
+            <Typography variant={ 'h3' }>~{ moment(endTime).format("YYYY/MM/DD kk:mm") }</Typography>
+            <Typography variant={ 'h5' } className={ classes.grey }>Vote End: {proposal.end}</Typography>
+          </div>
         </div>
-        <div className={classes.heading}>
-          <Typography variant={ 'h3' }>~{ moment(startTime).format("YYYY/MM/DD kk:mm") }</Typography>
-          <Typography variant={ 'h5' } className={ classes.grey }>Vote Start Time</Typography>
-        </div>
-        <div className={classes.heading}>
-          <Typography variant={ 'h3' }>{ proposal.end }</Typography>
-          <Typography variant={ 'h5' } className={ classes.grey }>Vote End Block</Typography>
-        </div>
-        <div className={classes.heading}>
-          <Typography variant={ 'h3' }>~{ moment(endTime).format("YYYY/MM/DD kk:mm") }</Typography>
-          <Typography variant={ 'h5' } className={ classes.grey }>Vote End Time</Typography>
-        </div>
+        { proposal.end > currentBlock &&
+          <div className={ classes.actionsContainer }>
+            <div className={ classes.tradeContainer }>
+              <Button
+                className={ classes.actionButton }
+                variant="outlined"
+                color="primary"
+                disabled={ loading || proposal.end < currentBlock }
+                onClick={ this.onVoteFor }
+                fullWidth
+                >
+                <Typography className={ classes.buttonText } variant={ 'h5'} color={'secondary'}>Vote For</Typography>
+              </Button>
+            </div>
+            <div className={ classes.sepperator }></div>
+            <div className={classes.tradeContainer}>
+              <Button
+                className={ classes.actionButton }
+                variant="outlined"
+                color="primary"
+                disabled={ loading || proposal.end < currentBlock }
+                onClick={ this.onVoteAgainst }
+                fullWidth
+                >
+                <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Vote Against</Typography>
+              </Button>
+            </div>
+          </div>
+        }
       </div>
-      <div className={ classes.tradeContainer }>
-        <Button
-          className={ classes.actionButton }
-          variant="outlined"
-          color="primary"
-          disabled={ loading || proposal.end < currentBlock }
-          onClick={ this.onVoteFor }
-          fullWidth
-          >
-          <Typography className={ classes.buttonText } variant={ 'h5'} color={'secondary'}>Vote For</Typography>
-        </Button>
-      </div>
-      <div className={ classes.sepperator }></div>
-      <div className={classes.tradeContainer}>
-        <Button
-          className={ classes.actionButton }
-          variant="outlined"
-          color="primary"
-          disabled={ loading || proposal.end < currentBlock }
-          onClick={ this.onVoteAgainst }
-          fullWidth
-          >
-          <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Vote Against</Typography>
-        </Button>
-      </div>
-    </div>)
+    )
   };
+
+  copyAddressToClipboard = (event, address) => {
+    event.stopPropagation();
+    navigator.clipboard.writeText(address).then(() => {
+      this.showAddressCopiedSnack();
+    });
+  }
+
+  showAddressCopiedSnack = () => {
+    this.props.showSnackbar("Address Copied to Clipboard", 'Success')
+  }
 
   onVoteFor = () => {
     const { proposal, startLoading } = this.props

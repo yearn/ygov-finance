@@ -749,8 +749,9 @@ class Store {
 
   propose = (payload) => {
     const account = store.getStore('account')
+    const { executor, hash } = payload.content
 
-    this._callPropose(account, (err, res) => {
+    this._callPropose(account, executor, hash, (err, res) => {
       if(err) {
         return emitter.emit(ERROR, err);
       }
@@ -759,7 +760,7 @@ class Store {
     })
   }
 
-  _callPropose = async (account, callback) => {
+  _callPropose = async (account, executor, hash, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
     const governanceContractVersion = store.getStore('governanceContractVersion')
@@ -768,7 +769,14 @@ class Store {
 
     const governanceContract = new web3.eth.Contract(abi,address)
 
-    governanceContract.methods.propose().send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+    let call = null
+    if(governanceContractVersion === 1) {
+      call = governanceContract.methods.propose()
+    } else {
+      call = governanceContract.methods.propose(executor, hash)
+    }
+
+    call.send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
       .on('transactionHash', function(hash){
         console.log(hash)
         callback(null, hash)
@@ -853,8 +861,14 @@ class Store {
       const address = governanceContractVersion === 1 ? config.governanceAddress  : config.governanceV2Address
 
       const governanceContract = new web3.eth.Contract(abi, address)
-      var proposals = await governanceContract.methods.proposals(number).call({ from: account.address });
-      callback(null, proposals)
+      var proposal = await governanceContract.methods.proposals(number).call({ from: account.address });
+
+      proposal.executor = governanceContractVersion === 1 ? '0x0000000000000000000000000000000000000000' : proposal.executor
+      proposal.hash = governanceContractVersion === 1 ? 'na' : proposal.hash
+      proposal.quorum = governanceContractVersion === 1 ? 'na' : proposal.quorum
+      proposal.quorumRequired = governanceContractVersion === 1 ? 'na' : proposal.quorumRequired
+
+      callback(null, proposal)
     } catch(ex) {
       return callback(ex)
     }

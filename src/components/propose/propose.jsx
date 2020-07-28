@@ -21,6 +21,7 @@ import {
   CONFIGURE_RETURNED,
   PROPOSE,
   PROPOSE_RETURNED,
+  GOVERNANCE_CONTRACT_CHANGED
 } from '../../constants'
 
 const styles = theme => ({
@@ -40,7 +41,7 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    maxWidth: '400px'
+    maxWidth: '700px'
   },
   introCenter: {
     minWidth: '100%',
@@ -148,28 +149,51 @@ class Propose extends Component {
     super()
 
     const account = store.getStore('account')
+    const governanceContractVersion = store.getStore('governanceContractVersion')
 
     this.state = {
       loading: false,
-      account: account
+      account: account,
+      executor: '',
+      hash: '',
+      governanceContractVersion: governanceContractVersion
     }
   }
 
   componentWillMount() {
+    emitter.on(ERROR, this.errorReturned);
     emitter.on(CONFIGURE_RETURNED, this.configureReturned)
     emitter.on(PROPOSE_RETURNED, this.showHash)
+    emitter.on(GOVERNANCE_CONTRACT_CHANGED, this.setGovernanceContract)
   }
 
   componentWillUnmount() {
+    emitter.removeListener(ERROR, this.errorReturned);
     emitter.removeListener(CONFIGURE_RETURNED, this.configureReturned)
     emitter.removeListener(PROPOSE_RETURNED, this.showHash)
+    emitter.removeListener(GOVERNANCE_CONTRACT_CHANGED, this.setGovernanceContract)
   };
+
+  setGovernanceContract = () => {
+    this.setState({ governanceContractVersion: store.getStore('governanceContractVersion') })
+  }
 
   showHash = (txHash) => {
     this.setState({ snackbarMessage: null, snackbarType: null, loading: false })
     const that = this
     setTimeout(() => {
       const snackbarObj = { snackbarMessage: txHash, snackbarType: 'Hash' }
+      that.setState(snackbarObj)
+    })
+  };
+
+  errorReturned = (error) => {
+    const snackbarObj = { snackbarMessage: null, snackbarType: null }
+    this.setState(snackbarObj)
+    this.setState({ loading: false })
+    const that = this
+    setTimeout(() => {
+      const snackbarObj = { snackbarMessage: error.toString(), snackbarType: 'Error' }
       that.setState(snackbarObj)
     })
   };
@@ -186,10 +210,11 @@ class Propose extends Component {
       loading,
       modalOpen,
       snackbarMessage,
-      title,
-      titleError,
-      description,
-      descriptionError
+      executor,
+      executorError,
+      hash,
+      hashError,
+      governanceContractVersion
     } = this.state
 
     var address = null;
@@ -201,6 +226,15 @@ class Propose extends Component {
       <div className={ classes.root }>
         <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
         <div className={ classes.intro }>
+          <Button
+            className={ classes.stakeButton }
+            variant="outlined"
+            color="secondary"
+            disabled={ loading }
+            onClick={ () => {  this.props.history.push('/vote') } }
+          >
+            <Typography variant={ 'h4'}>Back</Typography>
+          </Button>
           <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
             <Typography variant={ 'h3'} className={ classes.walletTitle } noWrap>Wallet</Typography>
             <Typography variant={ 'h4'} className={ classes.walletAddress } noWrap>{ address }</Typography>
@@ -208,40 +242,46 @@ class Propose extends Component {
           </Card>
         </div>
         <div className={ classes.proposalContainer }>
-          <div className={ classes.field }>
-            <div className={ classes.fieldTitle }>
-              <Typography variant='h4'>Title</Typography>
+          { governanceContractVersion === 2 &&
+            <div className={ classes.field }>
+              <div className={ classes.fieldTitle }>
+                <Typography variant='h4'>Executor</Typography>
+              </div>
+              <TextField
+                fullWidth
+                disabled={ loading }
+                className={ classes.titleInput }
+                id={ 'executor' }
+                value={ executor }
+                error={ executorError }
+                helperText={ executorError }
+                onChange={ this.onChange }
+                placeholder="0x..."
+                variant="outlined"
+              />
             </div>
-            <TextField
-              fullWidth
-              disabled={ loading }
-              className={ classes.titleInput }
-              id={ 'title' }
-              value={ title }
-              error={ titleError }
-              onChange={ this.onChange }
-              placeholder="Keep it brief"
-              variant="outlined"
-            />
-          </div>
-          <div className={ classes.field }>
-            <div className={ classes.fieldTitle }>
-              <Typography variant='h4'>Description</Typography>
+          }
+          { governanceContractVersion === 2 &&
+            <div className={ classes.field }>
+              <div className={ classes.fieldTitle }>
+                <Typography variant='h4'>IPFS Hash</Typography>
+              </div>
+              <TextField
+                fullWidth
+                disabled={ loading }
+                className={ classes.titleInput }
+                id={ 'hash' }
+                value={ hash }
+                error={ hashError }
+                helperText={ hashError }
+                onChange={ this.onChange }
+                multiline
+                rows={6}
+                placeholder="IPFS hash for the proposal text"
+                variant="outlined"
+              />
             </div>
-            <TextField
-              fullWidth
-              disabled={ loading }
-              className={ classes.titleInput }
-              id={ 'description' }
-              value={ description }
-              error={ descriptionError }
-              onChange={ this.onChange }
-              multiline
-              rows={6}
-              placeholder="Explain yourself"
-              variant="outlined"
-            />
-          </div>
+          }
           <Button
             className={ classes.stakeButton }
             variant="outlined"
@@ -249,7 +289,7 @@ class Propose extends Component {
             disabled={ loading }
             onClick={ () => { this.onPropose() } }
           >
-            <Typography variant={ 'h4'}>Propose a vote</Typography>
+            <Typography variant={ 'h4'}>Generate proposal</Typography>
           </Button>
         </div>
         { snackbarMessage && this.renderSnackbar() }
@@ -266,8 +306,25 @@ class Propose extends Component {
   }
 
   onPropose = () => {
-    this.setState({ loading: true })
-    dispatcher.dispatch({ type: PROPOSE, content: {  } })
+    this.setState({ executorError: false, hashError: false })
+    const { executor, hash, governanceContractVersion } = this.state
+
+    let error = false
+
+    if(governanceContractVersion === 2 && (!executor || executor === '')) {
+      this.setState({ executorError: 'This field is required' })
+      error = true
+    }
+
+    if(governanceContractVersion === 2 && (!hash || hash === '')) {
+      this.setState({ hashError: 'This field is required' })
+      error = true
+    }
+
+    if(!error) {
+      this.setState({ loading: true })
+      dispatcher.dispatch({ type: PROPOSE, content: { executor, hash  } })
+    }
   }
 
   renderModal = () => {
