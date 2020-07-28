@@ -19,6 +19,7 @@ import Header from './components/header';
 // import Propose from './components/propose';
 import Claim from './components/claim';
 import Vote from './components/vote';
+import VersionToggle from './components/versionToggle';
 
 import {
   CONNECTION_CONNECTED,
@@ -131,10 +132,12 @@ class App extends Component {
                   <Stake />
                 </Route>
                 <Route path="/staking">
+                  <VersionToggle />
                   <Footer />
                   <RewardsPools />
                 </Route>
                 <Route path="/vote">
+                  <VersionToggle />
                   <Footer />
                   <Vote />
                 </Route>

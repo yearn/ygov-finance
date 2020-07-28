@@ -52,7 +52,6 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    maxWidth: '400px'
   },
   introCenter: {
     minWidth: '100%',
@@ -226,7 +225,13 @@ const styles = theme => ({
   },
   voteLockMessage: {
     margin: '20px'
-  }
+  },
+  title: {
+    width: '100%',
+    color: colors.darkGray,
+    minWidth: '100%',
+    marginLeft: '20px'
+  },
 })
 
 const emitter = Store.emitter
@@ -240,6 +245,7 @@ class Stake extends Component {
 
     const account = store.getStore('account')
     const pool = store.getStore('currentPool')
+    const governanceContractVersion = store.getStore('governanceContractVersion')
 
     if(!pool) {
       props.history.push('/')
@@ -252,10 +258,11 @@ class Stake extends Component {
       value: 'options',
       voteLockValid: false,
       balanceValid: false,
-      voteLock: null
+      voteLock: null,
+      governanceContractVersion: governanceContractVersion
     }
 
-    if(pool && ['Fee Rewards', 'Governance'].includes(pool.id)) {
+    if(pool && ['FeeRewards', 'Governance'].includes(pool.id)) {
       dispatcher.dispatch({ type: GET_YCRV_REQUIREMENTS, content: {} })
     }
   }
@@ -347,6 +354,15 @@ class Stake extends Component {
       <div className={ classes.root }>
         <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
         <div className={ classes.intro }>
+          <Button
+            className={ classes.stakeButton }
+            variant="outlined"
+            color="secondary"
+            disabled={ loading }
+            onClick={ () => {  this.props.history.push('/staking') } }
+          >
+            <Typography variant={ 'h4'}>Back</Typography>
+          </Button>
           <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
             <Typography variant={ 'h3'} className={ classes.walletTitle } noWrap>Wallet</Typography>
             <Typography variant={ 'h4'} className={ classes.walletAddress } noWrap>{ address }</Typography>
@@ -367,7 +383,7 @@ class Stake extends Component {
             <Typography variant={ 'h2' } className={ classes.overviewValue }>{ pool.tokens[0].rewardsSymbol == '$' ? pool.tokens[0].rewardsSymbol : '' } { pool.tokens[0].rewardsAvailable ? pool.tokens[0].rewardsAvailable.toFixed(2) : "0" } { pool.tokens[0].rewardsSymbol != '$' ? pool.tokens[0].rewardsSymbol : '' }</Typography>
           </div>
         </div>
-        { pool.id === 'Fee Rewards' &&
+        { ['FeeRewards'].includes(pool.id) &&
           <div className={ classes.actions }>
             <Typography className={ classes.stakeTitle } variant={ 'h3'}>yCRV reward requirements</Typography>
             <div className={ classes.requirement }>
@@ -396,13 +412,14 @@ class Stake extends Component {
 
     return (
       <div className={ classes.actions }>
+        <Typography variant={ 'h3'} className={ classes.title } noWrap>{ pool.name }</Typography>
         <div className={ classes.actionContainer}>
           <Button
             fullWidth
             className={ classes.primaryButton }
             variant="outlined"
             color="primary"
-            disabled={ !pool.depositsEnabled || (pool.id === 'Fee Rewards' ?  (loading || !voteLockValid || !balanceValid) : loading) }
+            disabled={ !pool.depositsEnabled || (['FeeRewards'].includes(pool.id) ?  (loading || !voteLockValid || !balanceValid) : loading) }
             onClick={ () => { this.navigateInternal('stake') } }
             >
             <Typography className={ classes.stakeButtonText } variant={ 'h4'}>Stake Tokens</Typography>

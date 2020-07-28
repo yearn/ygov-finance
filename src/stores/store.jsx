@@ -63,6 +63,7 @@ class Store {
   constructor() {
 
     this.store = {
+      governanceContractVersion: 2,
       currentBlock: 0,
       universalGasPrice: '70',
       account: {},
@@ -114,7 +115,7 @@ class Store {
       rewardPools: [
         {
           id: 'yearn',
-          name: 'yearn.finance',
+          name: 'yearn',
           website: 'curve.fi/y',
           link: 'https://curve.fi/y',
           depositsEnabled: false,
@@ -136,8 +137,8 @@ class Store {
           ]
         },
         {
-          id: 'balancer',
-          name: 'Balancer Pool',
+          id: 'Balancer',
+          name: 'Balancer',
           website: 'pools.balancer.exchange',
           link: 'https://pools.balancer.exchange/#/pool/0x60626db611a9957C1ae4Ac5b7eDE69e24A3B76c5',
           depositsEnabled: false,
@@ -163,7 +164,7 @@ class Store {
           name: 'Governance',
           website: 'pools.balancer.exchange',
           link: 'https://pools.balancer.exchange/#/pool/0x95c4b6c7cff608c0ca048df8b81a484aa377172b',
-          depositsEnabled: true,
+          depositsEnabled: false,
           tokens: [
             {
               id: 'bpt',
@@ -182,8 +183,31 @@ class Store {
           ]
         },
         {
-          id: 'Fee Rewards',
-          name: 'Fee Rewards',
+          id: 'FeeRewards',
+          name: 'Fee Rewards V1',
+          website: 'ygov.finance',
+          link: 'https://ygov.finance/',
+          depositsEnabled: false,
+          tokens: [
+            {
+              id: 'yfi',
+              address: config.yfiAddress,
+              symbol: 'YFI',
+              abi: config.yfiABI,
+              decimals: 18,
+              rewardsAddress: config.feeRewardsAddress,
+              rewardsABI: config.feeRewardsABI,
+              rewardsSymbol: '$',
+              decimals: 18,
+              balance: 0,
+              stakedBalance: 0,
+              rewardsAvailable: 0
+            }
+          ]
+        },
+        {
+          id: 'FeeRewardsV2',
+          name: 'Fee Rewards V2',
           website: 'ygov.finance',
           link: 'https://ygov.finance/',
           depositsEnabled: true,
@@ -194,8 +218,8 @@ class Store {
               symbol: 'YFI',
               abi: config.yfiABI,
               decimals: 18,
-              rewardsAddress: config.feeRewardsAddress,
-              rewardsABI: config.feeRewardsABI,
+              rewardsAddress: config.governanceV2Address,
+              rewardsABI: config.governanceV2ABI,
               rewardsSymbol: '$',
               decimals: 18,
               balance: 0,
@@ -738,7 +762,11 @@ class Store {
   _callPropose = async (account, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
-    const governanceContract = new web3.eth.Contract(config.governanceABI, config.governanceAddress)
+    const governanceContractVersion = store.getStore('governanceContractVersion')
+    const abi = governanceContractVersion === 1 ? config.governanceABI  : config.governanceV2ABI
+    const address = governanceContractVersion === 1 ? config.governanceAddress  : config.governanceV2Address
+
+    const governanceContract = new web3.eth.Contract(abi,address)
 
     governanceContract.methods.propose().send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
       .on('transactionHash', function(hash){
@@ -804,7 +832,12 @@ class Store {
 
   _getProposalCount = async (web3, account, callback) => {
     try {
-      const governanceContract = new web3.eth.Contract(config.governanceABI, config.governanceAddress)
+
+      const governanceContractVersion = store.getStore('governanceContractVersion')
+      const abi = governanceContractVersion === 1 ? config.governanceABI  : config.governanceV2ABI
+      const address = governanceContractVersion === 1 ? config.governanceAddress  : config.governanceV2Address
+
+      const governanceContract = new web3.eth.Contract(abi, address)
       var proposals = await governanceContract.methods.proposalCount().call({ from: account.address });
       callback(null, proposals)
     } catch(ex) {
@@ -814,7 +847,12 @@ class Store {
 
   _getProposals = async (web3, account, number, callback) => {
     try {
-      const governanceContract = new web3.eth.Contract(config.governanceABI, config.governanceAddress)
+
+      const governanceContractVersion = store.getStore('governanceContractVersion')
+      const abi = governanceContractVersion === 1 ? config.governanceABI  : config.governanceV2ABI
+      const address = governanceContractVersion === 1 ? config.governanceAddress  : config.governanceV2Address
+
+      const governanceContract = new web3.eth.Contract(abi, address)
       var proposals = await governanceContract.methods.proposals(number).call({ from: account.address });
       callback(null, proposals)
     } catch(ex) {
@@ -838,7 +876,11 @@ class Store {
   _callVoteFor = async (proposal, account, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
-    const governanceContract = new web3.eth.Contract(config.governanceABI, config.governanceAddress)
+    const governanceContractVersion = store.getStore('governanceContractVersion')
+    const abi = governanceContractVersion === 1 ? config.governanceABI  : config.governanceV2ABI
+    const address = governanceContractVersion === 1 ? config.governanceAddress  : config.governanceV2Address
+
+    const governanceContract = new web3.eth.Contract(abi,address)
 
     governanceContract.methods.voteFor(proposal.id).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
       .on('transactionHash', function(hash){
@@ -888,7 +930,11 @@ class Store {
   _callVoteAgainst = async (proposal, account, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
-    const governanceContract = new web3.eth.Contract(config.governanceABI, config.governanceAddress)
+    const governanceContractVersion = store.getStore('governanceContractVersion')
+    const abi = governanceContractVersion === 1 ? config.governanceABI  : config.governanceV2ABI
+    const address = governanceContractVersion === 1 ? config.governanceAddress  : config.governanceV2Address
+
+    const governanceContract = new web3.eth.Contract(abi,address)
 
     governanceContract.methods.voteAgainst(proposal.id).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
       .on('transactionHash', function(hash){
@@ -1057,7 +1103,8 @@ class Store {
       const account = store.getStore('account')
       const web3 = new Web3(store.getStore('web3context').library.provider);
 
-      const governanceContract = new web3.eth.Contract(config.governanceABI, config.governanceAddress)
+      const governanceContract = new web3.eth.Contract(config.governanceABI,config.governanceAddress)
+
       let balance = await governanceContract.methods.balanceOf(account.address).call({ from: account.address })
       balance = parseFloat(balance)/10**18
 

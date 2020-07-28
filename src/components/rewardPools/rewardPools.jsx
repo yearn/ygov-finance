@@ -17,6 +17,7 @@ import {
   CONFIGURE_RETURNED,
   GET_BALANCES,
   GET_BALANCES_RETURNED,
+  GOVERNANCE_CONTRACT_CHANGED
 } from '../../constants'
 
 const styles = theme => ({
@@ -165,12 +166,14 @@ class RewardPools extends Component {
     super()
 
     const account = store.getStore('account')
+    const governanceContractVersion = store.getStore('governanceContractVersion')
     const rewardPools = store.getStore('rewardPools')
 
     this.state = {
       rewardPools: rewardPools,
       loading: !(account && rewardPools),
-      account: account
+      account: account,
+      governanceContractVersion: governanceContractVersion
     }
 
     dispatcher.dispatch({ type: GET_BALANCES, content: {} })
@@ -179,12 +182,18 @@ class RewardPools extends Component {
   componentWillMount() {
     emitter.on(CONFIGURE_RETURNED, this.configureReturned);
     emitter.on(GET_BALANCES_RETURNED, this.balancesReturned);
+    emitter.on(GOVERNANCE_CONTRACT_CHANGED, this.setGovernanceContract);
   }
 
   componentWillUnmount() {
     emitter.removeListener(CONFIGURE_RETURNED, this.configureReturned);
     emitter.removeListener(GET_BALANCES_RETURNED, this.balancesReturned);
+    emitter.removeListener(GOVERNANCE_CONTRACT_CHANGED, this.setGovernanceContract);
   };
+
+  setGovernanceContract = () => {
+    this.setState({ governanceContractVersion: store.getStore('governanceContractVersion') })
+  }
 
   balancesReturned = () => {
     const rewardPools = store.getStore('rewardPools')
@@ -231,9 +240,21 @@ class RewardPools extends Component {
   }
 
   renderRewards = () => {
-    const { rewardPools } = this.state
+    const { rewardPools, governanceContractVersion } = this.state
 
-    return rewardPools.map((rewardPool) => {
+    return rewardPools.filter((rewardPool) => {
+      if(['FeeRewards', 'FeeRewardsV2'].includes(rewardPool.id)) {
+        if('FeeRewards' === rewardPool.id && governanceContractVersion === 1) {
+          return true
+        } else if ('FeeRewardsV2' === rewardPool.id && governanceContractVersion === 2) {
+          return true
+        } else {
+          return false
+        }
+      }
+
+      return true
+    }).map((rewardPool) => {
       return this.renderRewardPool(rewardPool)
     })
   }
@@ -242,17 +263,19 @@ class RewardPools extends Component {
 
     const { classes } = this.props
 
-    let tokensList = rewardPool.tokens.map((rp) => { return rp.symbol }).join(', ')
-    if(tokensList.length > 2) {
-      tokensList = (tokensList + ' ...')
+    var address = null;
+    let addy = ''
+    if (rewardPool.tokens && rewardPool.tokens[0]) {
+      addy = rewardPool.tokens[0].rewardsAddress
+      address = addy.substring(0,6)+'...'+addy.substring(addy.length-4,addy.length)
     }
 
     return (<div className={ classes.rewardPoolContainer} key={ rewardPool.id } >
-      <Typography variant='h3' className={ classes.poolName }>{ rewardPool.id }</Typography>
+      <Typography variant='h3' className={ classes.poolName }>{ rewardPool.name }</Typography>
       <Typography variant='h5' className={ classes.poolWebsite }><a href={ rewardPool.link } target="_blank">{ rewardPool.website }</a></Typography>
       <Typography varian='h4' className={ classes.tokensList } align='center'>
-        { rewardPool.tokens.length > 0 && "Supported Tokens: " + tokensList  }
-        { rewardPool.tokens.length == 0 && "No supported tokens currently"  }
+        Contract Address: <a href={ 'https://etherscan.io/address/'+addy } target="_blank">{ address }</a>
+
       </Typography>
       <Button
         variant="outlined"

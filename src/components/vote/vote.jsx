@@ -34,6 +34,7 @@ import {
   GET_PROPOSALS_RETURNED,
   VOTE_FOR_RETURNED,
   VOTE_AGAINST_RETURNED,
+  GOVERNANCE_CONTRACT_CHANGED
 } from '../../constants'
 
 const styles = theme => ({
@@ -224,7 +225,7 @@ const styles = theme => ({
     alignItems: 'center',
     '& > svg': {
       visibility: 'hidden',
-    }, 
+    },
     '&:hover > svg': {
       visibility: 'visible'
     }
@@ -260,6 +261,7 @@ class Vote extends Component {
     emitter.on(GET_PROPOSALS_RETURNED, this.proposalsReturned)
     emitter.on(VOTE_FOR_RETURNED, this.showHash);
     emitter.on(VOTE_AGAINST_RETURNED, this.showHash);
+    emitter.on(GOVERNANCE_CONTRACT_CHANGED, this.governanceContractChanged);
   }
 
   componentWillUnmount() {
@@ -269,7 +271,13 @@ class Vote extends Component {
     emitter.removeListener(GET_PROPOSALS_RETURNED, this.proposalsReturned)
     emitter.removeListener(VOTE_FOR_RETURNED, this.showHash);
     emitter.removeListener(VOTE_AGAINST_RETURNED, this.showHash);
+    emitter.removeListener(GOVERNANCE_CONTRACT_CHANGED, this.governanceContractChanged);
   };
+
+  governanceContractChanged = () => {
+    this.setState({ loading: true })
+    dispatcher.dispatch({ type: GET_PROPOSALS, content: {} })
+  }
 
   errorReturned = (error) => {
     this.setState({ loading: false })
@@ -277,7 +285,7 @@ class Vote extends Component {
 
   proposalsReturned = () => {
     const proposals = store.getStore('proposals')
-    this.setState({ proposals: proposals })
+    this.setState({ proposals: proposals, loading: false })
   }
 
   showHash = (txHash) => {
@@ -390,6 +398,8 @@ class Vote extends Component {
     let now = store.getStore('currentBlock')
 
     return proposals.filter((proposal) => {
+      return proposal.proposer != '0x0000000000000000000000000000000000000000'
+    }).filter((proposal) => {
       return (value === 0 ? proposal.end < now : proposal.end > now)
     }).map((proposal) => {
       var address = null;
