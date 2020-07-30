@@ -244,7 +244,7 @@ class Proposal extends Component {
       address = proposal.executor.substring(0,8)+'...'+proposal.executor.substring(proposal.executor.length-6,proposal.executor.length)
     }
 
-    const hashURL = 'https://ipfs.io/ipfs/'+proposal.hash
+    const hashURL = proposal.hash
 
     return (
       <div className={ classes.root }>
