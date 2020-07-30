@@ -189,7 +189,7 @@ class Store {
         },
         {
           id: 'FeeRewards',
-          name: 'Fee Rewards V1',
+          name: 'Fee Rewards',
           website: 'ygov.finance',
           link: 'https://ygov.finance/',
           depositsEnabled: false,

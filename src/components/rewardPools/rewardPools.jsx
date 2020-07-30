@@ -243,17 +243,13 @@ class RewardPools extends Component {
     const { rewardPools, governanceContractVersion } = this.state
 
     return rewardPools.filter((rewardPool) => {
-      if(['Governance', 'FeeRewards', 'GovernanceV2'].includes(rewardPool.id)) {
-        if(['FeeRewards', 'Governance'].includes(rewardPool.id) && governanceContractVersion === 1) {
-          return true
-        } else if ('GovernanceV2' === rewardPool.id && governanceContractVersion === 2) {
-          return true
-        } else {
-          return false
-        }
+      if(['FeeRewards', 'Governance', 'yearn', 'Balancer'].includes(rewardPool.id) && governanceContractVersion === 1) {
+        return true
+      } else if ('GovernanceV2' === rewardPool.id && governanceContractVersion === 2) {
+        return true
+      } else {
+        return false
       }
-
-      return true
     }).map((rewardPool) => {
       return this.renderRewardPool(rewardPool)
     })
