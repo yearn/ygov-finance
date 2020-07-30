@@ -34,7 +34,10 @@ import {
   GET_PROPOSALS_RETURNED,
   VOTE_FOR_RETURNED,
   VOTE_AGAINST_RETURNED,
-  GOVERNANCE_CONTRACT_CHANGED
+  GOVERNANCE_CONTRACT_CHANGED,
+  GET_VOTE_STATUS,
+  GET_VOTE_STATUS_RETURNED,
+  REGISTER_VOTE_RETURNED
 } from '../../constants'
 
 const styles = theme => ({
@@ -252,6 +255,7 @@ class Vote extends Component {
     }
 
     dispatcher.dispatch({ type: GET_PROPOSALS, content: {} })
+    dispatcher.dispatch({ type: GET_VOTE_STATUS, content: {} })
   }
 
   componentWillMount() {
@@ -262,6 +266,8 @@ class Vote extends Component {
     emitter.on(VOTE_FOR_RETURNED, this.showHash);
     emitter.on(VOTE_AGAINST_RETURNED, this.showHash);
     emitter.on(GOVERNANCE_CONTRACT_CHANGED, this.governanceContractChanged);
+    emitter.on(GET_VOTE_STATUS_RETURNED, this.voteStatusReturned);
+    emitter.on(REGISTER_VOTE_RETURNED, this.registerVoteReturned);
   }
 
   componentWillUnmount() {
@@ -272,6 +278,8 @@ class Vote extends Component {
     emitter.removeListener(VOTE_FOR_RETURNED, this.showHash);
     emitter.removeListener(VOTE_AGAINST_RETURNED, this.showHash);
     emitter.removeListener(GOVERNANCE_CONTRACT_CHANGED, this.governanceContractChanged);
+    emitter.removeListener(GET_VOTE_STATUS_RETURNED, this.voteStatusReturned);
+    emitter.removeListener(REGISTER_VOTE_RETURNED, this.registerVoteReturned);
   };
 
   governanceContractChanged = () => {
@@ -282,6 +290,14 @@ class Vote extends Component {
   errorReturned = (error) => {
     this.setState({ loading: false })
   };
+
+  registerVoteReturned = () => {
+    this.setState({ loading: false })
+  };
+
+  voteStatusReturned = () => {
+
+  }
 
   proposalsReturned = () => {
     const proposals = store.getStore('proposals')
@@ -386,8 +402,15 @@ class Vote extends Component {
     const { proposals, expanded, value } = this.state
     const { classes, t } = this.props
     const width = window.innerWidth
+    const now = store.getStore('currentBlock')
 
-    if(proposals.length === 0) {
+    const filteredProposals = proposals.filter((proposal) => {
+      return proposal.proposer != '0x0000000000000000000000000000000000000000'
+    }).filter((proposal) => {
+      return (value === 0 ? proposal.end < now : proposal.end > now)
+    })
+
+    if(filteredProposals.length === 0) {
       return (
         <div className={ classes.claimContainer }>
           <Typography className={ classes.stakeTitle } variant={ 'h3'}>No proposals</Typography>
@@ -395,13 +418,7 @@ class Vote extends Component {
       )
     }
 
-    let now = store.getStore('currentBlock')
-
-    return proposals.filter((proposal) => {
-      return proposal.proposer != '0x0000000000000000000000000000000000000000'
-    }).filter((proposal) => {
-      return (value === 0 ? proposal.end < now : proposal.end > now)
-    }).map((proposal) => {
+    return filteredProposals.map((proposal) => {
       var address = null;
       if (proposal.proposer) {
         address = proposal.proposer.substring(0,8)+'...'+proposal.proposer.substring(proposal.proposer.length-6,proposal.proposer.length)
@@ -436,14 +453,6 @@ class Vote extends Component {
                 <Typography variant={ 'h3' }>{ proposal.totalAgainstVotes ? (parseFloat(proposal.totalAgainstVotes)/10**18).toLocaleString(undefined, { maximumFractionDigits: 4, minimumFractionDigits: 4 }) : 0 }</Typography>
                 <Typography variant={ 'h5' } className={ classes.grey }>Votes Against { proposal.totalAgainstVotes !== "0" ? ((parseFloat(proposal.totalAgainstVotes)/10**18) / ((parseFloat(proposal.totalForVotes)/10**18) + (parseFloat(proposal.totalAgainstVotes)/10**18)) * 100).toFixed(2) : 0 }%</Typography>
               </div>
-              {/*<div className={classes.heading}>
-                <Typography variant={ 'h3' }>{ proposal.start }</Typography>
-                <Typography variant={ 'h5' } className={ classes.grey }>Vote Starts</Typography>
-              </div>
-              <div className={classes.heading}>
-                <Typography variant={ 'h3' }>{ proposal.end }</Typography>
-                <Typography variant={ 'h5' } className={ classes.grey }>Vote Ends</Typography>
-              </div>*/}
             </div>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
@@ -484,8 +493,6 @@ class Vote extends Component {
   }
 
   onPropose = () => {
-    // this.setState({ loading: true })
-    // dispatcher.dispatch({ type: PROPOSE, content: {  } })
     this.props.history.push('propose')
   }
 

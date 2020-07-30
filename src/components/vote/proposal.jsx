@@ -16,7 +16,11 @@ import {
   VOTE_FOR_RETURNED,
   VOTE_AGAINST,
   VOTE_AGAINST_RETURNED,
-  GET_BALANCES_RETURNED
+  GET_BALANCES_RETURNED,
+  REGISTER_VOTE,
+  REGISTER_VOTE_RETURNED,
+  GET_VOTE_STATUS_RETURNED,
+  GOVERNANCE_CONTRACT_CHANGED,
 } from '../../constants'
 
 import CopyIcon from '@material-ui/icons/FileCopy';
@@ -144,7 +148,9 @@ class Proposal extends Component {
   constructor() {
     super()
 
-    let now = store.getStore('currentBlock')
+    const now = store.getStore('currentBlock')
+    const votingStatus = store.getStore('votingStatus')
+    const governanceContractVersion = store.getStore('governanceContractVersion')
 
     this.state = {
       amount: '',
@@ -153,7 +159,9 @@ class Proposal extends Component {
       redeemAmountError: false,
       account: store.getStore('account'),
       currentBlock: now,
-      currentTime: new Date().getTime()
+      currentTime: new Date().getTime(),
+      votingStatus: votingStatus,
+      governanceContractVersion: governanceContractVersion
     }
   }
 
@@ -161,6 +169,9 @@ class Proposal extends Component {
     emitter.on(VOTE_FOR_RETURNED, this.voteForReturned);
     emitter.on(VOTE_AGAINST_RETURNED, this.voteAgainstReturned);
     emitter.on(GET_BALANCES_RETURNED, this.balancesUpdated);
+    emitter.on(REGISTER_VOTE_RETURNED, this.registerReturned);
+    emitter.on(GET_VOTE_STATUS_RETURNED, this.voteStatusReturned);
+    emitter.on(GOVERNANCE_CONTRACT_CHANGED, this.governanceContractChanged);
     emitter.on(ERROR, this.errorReturned);
   }
 
@@ -168,8 +179,29 @@ class Proposal extends Component {
     emitter.removeListener(VOTE_FOR_RETURNED, this.voteForReturned);
     emitter.removeListener(VOTE_AGAINST_RETURNED, this.voteAgainstReturned);
     emitter.removeListener(GET_BALANCES_RETURNED, this.balancesUpdated);
+    emitter.removeListener(REGISTER_VOTE_RETURNED, this.registerReturned);
+    emitter.removeListener(GET_VOTE_STATUS_RETURNED, this.voteStatusReturned);
+    emitter.removeListener(GOVERNANCE_CONTRACT_CHANGED, this.governanceContractChanged);
     emitter.removeListener(ERROR, this.errorReturned);
   };
+
+  governanceContractChanged = () => {
+    this.setState({ governanceContractVersion: store.getStore('governanceContractVersion') })
+  }
+
+  registerReturned = () => {
+    this.setState({
+      votingStatus: store.getStore('votingStatus'),
+      loading: false
+    })
+  };
+
+  voteStatusReturned = () => {
+    this.setState({
+      votingStatus: store.getStore('votingStatus'),
+      loading: false
+    })
+  }
 
   balancesUpdated = () => {
     let now = store.getStore('currentBlock')
@@ -194,7 +226,9 @@ class Proposal extends Component {
       account,
       loading,
       currentBlock,
-      currentTime
+      currentTime,
+      votingStatus,
+      governanceContractVersion
     } = this.state
 
     const blocksTillEnd = proposal.end - currentBlock
@@ -251,32 +285,52 @@ class Proposal extends Component {
           </div>
         </div>
         { proposal.end > currentBlock &&
-          <div className={ classes.actionsContainer }>
-            <div className={ classes.tradeContainer }>
-              <Button
-                className={ classes.actionButton }
-                variant="outlined"
-                color="primary"
-                disabled={ loading || proposal.end < currentBlock }
-                onClick={ this.onVoteFor }
-                fullWidth
-                >
-                <Typography className={ classes.buttonText } variant={ 'h5'} color={'secondary'}>Vote For</Typography>
-              </Button>
-            </div>
-            <div className={ classes.sepperator }></div>
-            <div className={classes.tradeContainer}>
-              <Button
-                className={ classes.actionButton }
-                variant="outlined"
-                color="primary"
-                disabled={ loading || proposal.end < currentBlock }
-                onClick={ this.onVoteAgainst }
-                fullWidth
-                >
-                <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Vote Against</Typography>
-              </Button>
-            </div>
+          <div>
+            { (governanceContractVersion === 2 && votingStatus !== true) &&
+              <div className={ classes.actionsContainer }>
+                <div className={ classes.tradeContainer }>
+                  <Button
+                    className={ classes.actionButton }
+                    variant="outlined"
+                    color="primary"
+                    disabled={ loading }
+                    onClick={ this.onRegister }
+                    fullWidth
+                    >
+                    <Typography className={ classes.buttonText } variant={ 'h5'} color={'secondary'}>Register</Typography>
+                  </Button>
+                </div>
+              </div>
+            }
+            { (governanceContractVersion !== 2 || votingStatus === true) &&
+              <div className={ classes.actionsContainer }>
+                <div className={ classes.tradeContainer }>
+                  <Button
+                    className={ classes.actionButton }
+                    variant="outlined"
+                    color="primary"
+                    disabled={ loading || proposal.end < currentBlock }
+                    onClick={ this.onVoteFor }
+                    fullWidth
+                    >
+                    <Typography className={ classes.buttonText } variant={ 'h5'} color={'secondary'}>Vote For</Typography>
+                  </Button>
+                </div>
+                <div className={ classes.sepperator }></div>
+                <div className={classes.tradeContainer}>
+                  <Button
+                    className={ classes.actionButton }
+                    variant="outlined"
+                    color="primary"
+                    disabled={ loading || proposal.end < currentBlock }
+                    onClick={ this.onVoteAgainst }
+                    fullWidth
+                    >
+                    <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Vote Against</Typography>
+                  </Button>
+                </div>
+              </div>
+            }
           </div>
         }
       </div>
@@ -308,6 +362,14 @@ class Proposal extends Component {
     this.setState({ loading: true })
     startLoading()
     dispatcher.dispatch({ type: VOTE_AGAINST, content: { proposal: proposal } })
+  }
+
+  onRegister = () => {
+    const { startLoading } = this.props
+
+    this.setState({ loading: true })
+    startLoading()
+    dispatcher.dispatch({ type: REGISTER_VOTE, content: {  } })
   }
 }
 

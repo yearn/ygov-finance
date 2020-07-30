@@ -33,6 +33,10 @@ import {
   GET_CLAIMABLE_RETURNED,
   GET_YCRV_REQUIREMENTS,
   GET_YCRV_REQUIREMENTS_RETURNED,
+  REGISTER_VOTE,
+  REGISTER_VOTE_RETURNED,
+  GET_VOTE_STATUS,
+  GET_VOTE_STATUS_RETURNED
 } from '../constants';
 import Web3 from 'web3';
 
@@ -63,6 +67,7 @@ class Store {
   constructor() {
 
     this.store = {
+      votingStatus: false,
       governanceContractVersion: 2,
       currentBlock: 0,
       universalGasPrice: '70',
@@ -206,8 +211,8 @@ class Store {
           ]
         },
         {
-          id: 'FeeRewardsV2',
-          name: 'Fee Rewards V2',
+          id: 'GovernanceV2',
+          name: 'Governance V2',
           website: 'ygov.finance',
           link: 'https://ygov.finance/',
           depositsEnabled: true,
@@ -260,6 +265,12 @@ class Store {
             break;
           case GET_PROPOSALS:
             this.getProposals(payload)
+            break;
+          case REGISTER_VOTE:
+            this.registerVote(payload)
+            break;
+          case GET_VOTE_STATUS:
+            this.getVoteStatus(payload)
             break;
           case VOTE_FOR:
             this.voteFor(payload)
@@ -872,6 +883,71 @@ class Store {
     } catch(ex) {
       return callback(ex)
     }
+  }
+
+  getVoteStatus = async (payload) => {
+    try {
+      const account = store.getStore('account')
+      const web3 = new Web3(store.getStore('web3context').library.provider);
+
+      const governanceContract = new web3.eth.Contract(config.governanceV2ABI,config.governanceV2Address)
+
+      const status = await governanceContract.methods.voters(account.address).call({ from: account.address })
+
+      store.setStore({votingStatus: status})
+      emitter.emit(GET_VOTE_STATUS_RETURNED, status)
+
+    } catch(ex) {
+      return emitter.emit(ERROR, ex);
+    }
+  }
+
+  registerVote = (payload) => {
+    const account = store.getStore('account')
+
+    this._callRegisterVote(account, (err, res) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+
+      return emitter.emit(REGISTER_VOTE_RETURNED, res)
+    })
+  }
+
+  _callRegisterVote = async (account, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    const governanceContract = new web3.eth.Contract(config.governanceV2ABI, config.governanceV2Address)
+    governanceContract.methods.register().send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+      .on('transactionHash', function(hash){
+        console.log(hash)
+        callback(null, hash)
+      })
+      .on('confirmation', function(confirmationNumber, receipt){
+        console.log(confirmationNumber, receipt);
+        if(confirmationNumber == 2) {
+          dispatcher.dispatch({ type: GET_VOTE_STATUS, content: {} })
+        }
+      })
+      .on('receipt', function(receipt){
+        console.log(receipt);
+      })
+      .on('error', function(error) {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+      .catch((error) => {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
   }
 
   voteFor = (payload) => {
