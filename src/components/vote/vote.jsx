@@ -37,7 +37,8 @@ import {
   GOVERNANCE_CONTRACT_CHANGED,
   GET_VOTE_STATUS,
   GET_VOTE_STATUS_RETURNED,
-  REGISTER_VOTE_RETURNED
+  REGISTER_VOTE_RETURNED,
+  REGISTER_VOTE
 } from '../../constants'
 
 const styles = theme => ({
@@ -246,12 +247,16 @@ class Vote extends Component {
 
     const account = store.getStore('account')
     const proposals = store.getStore('proposals')
+    const votingStatus = store.getStore('votingStatus')
+    const governanceContractVersion = store.getStore('governanceContractVersion')
 
     this.state = {
       loading: false,
       account: account,
       proposals: proposals,
-      value: 1
+      value: 1,
+      votingStatus: votingStatus,
+      governanceContractVersion: governanceContractVersion
     }
 
     dispatcher.dispatch({ type: GET_PROPOSALS, content: {} })
@@ -283,7 +288,7 @@ class Vote extends Component {
   };
 
   governanceContractChanged = () => {
-    this.setState({ loading: true })
+    this.setState({ governanceContractVersion: store.getStore('governanceContractVersion'), loading: true })
     dispatcher.dispatch({ type: GET_PROPOSALS, content: {} })
   }
 
@@ -291,12 +296,19 @@ class Vote extends Component {
     this.setState({ loading: false })
   };
 
-  registerVoteReturned = () => {
-    this.setState({ loading: false })
+  registerVoteReturned = (txHash) => {
+    this.setState({
+      votingStatus: store.getStore('votingStatus'),
+      loading: false
+    })
+    this.showSnackbar(txHash, 'Hash')
   };
 
   voteStatusReturned = () => {
-
+    this.setState({
+      votingStatus: store.getStore('votingStatus'),
+      loading: false
+    })
   }
 
   proposalsReturned = () => {
@@ -336,7 +348,9 @@ class Vote extends Component {
       title,
       titleError,
       description,
-      descriptionError
+      descriptionError,
+      votingStatus,
+      governanceContractVersion
     } = this.state
 
     var address = null;
@@ -379,15 +393,28 @@ class Vote extends Component {
           <div className={ classes.between }>
           </div>
           <div className={ classes.proposalContainer }>
-            <Button
-              className={ classes.stakeButton }
-              variant="outlined"
-              color="secondary"
-              disabled={ loading }
-              onClick={ () => { this.onPropose() } }
-            >
-              <Typography variant={ 'h4'}>Generate a new proposal</Typography>
-            </Button>
+            { (governanceContractVersion === 2 && votingStatus !== true) &&
+              <Button
+                className={ classes.stakeButton }
+                variant="outlined"
+                color="secondary"
+                disabled={ loading }
+                onClick={ () => { this.onRegister() } }
+              >
+                <Typography variant={ 'h4'}>Register to vote</Typography>
+              </Button>
+            }
+            { (governanceContractVersion === 1 || votingStatus === true) &&
+              <Button
+                className={ classes.stakeButton }
+                variant="outlined"
+                color="secondary"
+                disabled={ loading }
+                onClick={ () => { this.onPropose() } }
+              >
+                <Typography variant={ 'h4'}>Generate a new proposal</Typography>
+              </Button>
+            }
           </div>
         </div>
         { this.renderProposals() }
@@ -494,6 +521,11 @@ class Vote extends Component {
 
   onPropose = () => {
     this.props.history.push('propose')
+  }
+
+  onRegister = () => {
+    this.setState({ loading: true })
+    dispatcher.dispatch({ type: REGISTER_VOTE, content: {  } })
   }
 
   renderModal = () => {
