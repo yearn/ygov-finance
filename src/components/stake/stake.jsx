@@ -431,7 +431,7 @@ class Stake extends Component {
             className={ classes.actionButton }
             variant="outlined"
             color="primary"
-            disabled={ loading }
+            disabled={ loading || (['GovernanceV2'].includes(pool.id) && !voteLock) }
             onClick={ () => { this.onClaim() } }
             >
             <Typography className={ classes.buttonText } variant={ 'h4'}>Claim Rewards</Typography>
@@ -450,18 +450,21 @@ class Stake extends Component {
           </Button>
         </div>
         <div className={ classes.actionContainer}>
-          <Button
-            fullWidth
-            className={ classes.actionButton }
-            variant="outlined"
-            color="primary"
-            disabled={ (pool.id === 'Governance' ? (loading || voteLockValid ) : loading  ) }
-            onClick={ () => { this.onExit() } }
-            >
-            <Typography className={ classes.buttonText } variant={ 'h4'}>Exit: Claim and Unstake</Typography>
-          </Button>
+          { !['GovernanceV2'].includes(pool.id) &&
+            <Button
+              fullWidth
+              className={ classes.actionButton }
+              variant="outlined"
+              color="primary"
+              disabled={ (pool.id === 'Governance' ? (loading || voteLockValid ) : loading  ) }
+              onClick={ () => { this.onExit() } }
+              >
+              <Typography className={ classes.buttonText } variant={ 'h4'}>Exit: Claim and Unstake</Typography>
+            </Button>
+          }
         </div>
-        { (pool.id === 'Governance' && voteLockValid) && <Typography variant={'h4'} className={ classes.voteLockMessage }>Unstaking tokens only allowed once all your pending votes have closed at Block: {voteLock}</Typography>}
+        { (['Governance', 'GovernanceV2'].includes(pool.id) && voteLockValid) && <Typography variant={'h4'} className={ classes.voteLockMessage }>Unstaking tokens only allowed once all your pending votes have closed at Block: {voteLock}</Typography> }
+        { (['GovernanceV2'].includes(pool.id) && !voteLock) && <Typography variant={'h4'} className={ classes.voteLockMessage }>You need to have voted in order to claim rewards</Typography> }
       </div>
     )
   }
