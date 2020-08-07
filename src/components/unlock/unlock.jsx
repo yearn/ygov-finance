@@ -14,7 +14,6 @@ import {
   useWeb3React,
 } from "@web3-react/core";
 import { Web3Provider } from "@ethersproject/providers";
-import { useEagerConnect, useInactiveListener } from "./hooks";
 
 import {
   ERROR,
@@ -84,7 +83,7 @@ const styles = theme => ({
 class Unlock extends Component {
 
   constructor(props) {
-    super()
+    super(props)
 
     this.state = {
       error: null,
@@ -93,7 +92,7 @@ class Unlock extends Component {
     }
   }
 
-  componentWillMount() {
+  componentDidMount() {
     emitter.on(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
     emitter.on(ERROR, this.error);
@@ -308,7 +307,7 @@ function MyComponent(props) {
                 }
               } src={url} alt=""/> }
               { activating && <CircularProgress size={ 15 } style={{marginRight: '10px'}} /> }
-              { (!activating && connected) && <div style={{ background: '#4caf50', borderRadius: '10px', width: '10px', height: '10px', marginRight: '10px' }}></div> }
+              { (!activating && connected) && <div style={{ background: '#4caf50', borderRadius: '10px', width: '10px', height: '10px', marginRight: '10px' }}/> }
             </Button>
           </div>
         )

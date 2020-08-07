@@ -8,19 +8,16 @@ import {
 import { colors } from '../../theme'
 
 import UnlockModal from '../unlock/unlockModal.jsx'
-import RefreshIcon from '@material-ui/icons/Refresh';
 
 import {
   ERROR,
   CONNECTION_CONNECTED,
   CONNECTION_DISCONNECTED,
-  CONFIGURE,
   CONFIGURE_RETURNED
 } from '../../constants'
 
 import Store from "../../stores";
 const emitter = Store.emitter
-const dispatcher = Store.dispatcher
 const store = Store.store
 
 const styles = theme => ({
@@ -40,7 +37,10 @@ const styles = theme => ({
   connectContainer: {
     padding: '20px'
   },
+  memeContainer: {
+  },
   actionButton: {
+    backgroundColor: colors.blue,
     color: colors.white,
     borderColor: colors.white
   },
@@ -94,7 +94,7 @@ const styles = theme => ({
 class Account extends Component {
 
   constructor(props) {
-    super()
+    super(props)
 
     const account = store.getStore('account')
 
@@ -105,7 +105,7 @@ class Account extends Component {
       modalOpen: false,
     }
   }
-  componentWillMount() {
+  componentDidMount() {
     emitter.on(ERROR, this.errorReturned);
     emitter.on(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
@@ -131,14 +131,13 @@ class Account extends Component {
     this.setState({ account: store.getStore('account'), loading: false })
   }
 
-  errorReturned = (error) => {
+  errorReturned = (_error) => {
     //TODO: handle errors
   };
 
   render() {
     const { classes } = this.props;
     const {
-      account,
       modalOpen,
     } = this.state
 
@@ -170,6 +169,9 @@ class Account extends Component {
             >
             <Typography>Connect</Typography>
           </Button>
+        </div>
+        <div className= {classes.memeContainer} >
+          <img src={require('../../assets/YFLink_white.svg')} height="280" alt="memetastic"/>
         </div>
       </div>
     )

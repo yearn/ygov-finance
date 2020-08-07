@@ -42,6 +42,8 @@ body {
   color: #212529;
   text-align: left;
   background-color: #fff;
+  background-image: url("assets/chainbg.png");
+  background-repeat: repeat;
 }
 
 html {

@@ -8,7 +8,6 @@ import {
   TextField,
   InputAdornment
 } from '@material-ui/core';
-import { withNamespaces } from 'react-i18next';
 
 import Loader from '../loader'
 import Snackbar from '../snackbar'
@@ -22,7 +21,6 @@ import {
   CONFIGURE_RETURNED,
   GET_CLAIMABLE_ASSET,
   GET_CLAIMABLE_ASSET_RETURNED,
-  GET_CLAIMABLE,
   GET_CLAIMABLE_RETURNED,
   CLAIM,
   CLAIM_RETURNED
@@ -193,7 +191,7 @@ const store = Store.store
 class Claim extends Component {
 
   constructor(props) {
-    super()
+    super(props)
 
     const account = store.getStore('account')
     const asset = store.getStore('claimableAsset')
@@ -207,7 +205,7 @@ class Claim extends Component {
     dispatcher.dispatch({ type: GET_CLAIMABLE_ASSET, content: {} })
   }
 
-  componentWillMount() {
+  componentDidMount() {
     emitter.on(ERROR, this.errorReturned);
     emitter.on(CONFIGURE_RETURNED, this.configureReturned)
     emitter.on(GET_CLAIMABLE_ASSET_RETURNED, this.assetReturned)
@@ -260,19 +258,14 @@ class Claim extends Component {
   render() {
     const { classes } = this.props;
     const {
-      value,
       account,
       loading,
       modalOpen,
       snackbarMessage,
-      title,
-      titleError,
-      description,
-      descriptionError,
       asset
     } = this.state
 
-    var address = null;
+    let address = null;
     if (account.address) {
       address = account.address.substring(0,6)+'...'+account.address.substring(account.address.length-4,account.address.length)
     }
@@ -284,7 +277,7 @@ class Claim extends Component {
           <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
             <Typography variant={ 'h3'} className={ classes.walletTitle } noWrap>Wallet</Typography>
             <Typography variant={ 'h4'} className={ classes.walletAddress } noWrap>{ address }</Typography>
-            <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}></div>
+            <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}/>
           </Card>
         </div>
         <div className={ classes.claimContainer }>
@@ -293,7 +286,7 @@ class Claim extends Component {
           <div className={ classes.stakeButtons }>
             <div className={ classes.priceContainer }>
               <Typography variant='h4' className={ classes.priceConversion }>Rewards available: </Typography>
-              <Typography variant={ 'h4' }className={ classes.priceConversion }>{ asset.claimableBalance } { asset.rewardSymbol }</Typography>
+              <Typography variant={ 'h4' } className={ classes.priceConversion }>{ asset.claimableBalance } { asset.rewardSymbol }</Typography>
             </div>
             <Button
               className={ classes.stakeButton }
@@ -313,7 +306,7 @@ class Claim extends Component {
     )
   }
 
-  renderAssetInput = (asset, type) => {
+  renderAssetInput = (asset, _type) => {
     const {
       classes
     } = this.props
@@ -327,7 +320,7 @@ class Claim extends Component {
     return (
       <div className={ classes.valContainer } key={asset.id}>
         <div className={ classes.balances }>
-          <Typography variant='h4' onClick={ () => { this.setAmount("amount", (asset ? asset.balance : 0)) } } className={ classes.value } noWrap>{ 'Balance: '+ ( asset && asset.balance ? (Math.floor(asset.balance*10000)/10000).toFixed(4) : '0.0000') } { asset ? asset.symbol : '' }</Typography>
+          <Typography variant='h4' onClick={ () => { this.setAmount("amount", (asset ? asset.balance : 0)) } } className={ classes.value } noWrap>{ 'Balance: '+ ( asset && asset.balance ? toFixed(asset.balance, asset.decimals, 6) : '0') } { asset ? asset.symbol : '' }</Typography>
         </div>
         <div>
           <TextField
@@ -359,7 +352,7 @@ class Claim extends Component {
   }
 
   setAmount = (id, balance) => {
-    const bal = (Math.floor((balance === '' ? '0' : balance)*10000)/10000).toFixed(4)
+    const bal = toFixed(balance, 18, 6)
     let val = []
     val[id] = bal
     this.setState(val)
@@ -399,7 +392,12 @@ class Claim extends Component {
   closeModal = () => {
     this.setState({ modalOpen: false })
   }
+}
 
+function toFixed(bi, decimals, desired) {
+  const trunc = decimals - desired
+  const shift = decimals - trunc
+  return (bi.divide(10**trunc).toJSNumber() / (10**shift)).toFixed(desired)
 }
 
 export default withRouter(withStyles(styles)(Claim));

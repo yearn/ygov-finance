@@ -19,7 +19,7 @@ const WorkSans = {
 export const colors = {
   white: "#fff",
   black: '#000',
-  darkBlue: "#2c3b57",
+  blackBlue: "#1e272f",
   blue: "#2F80ED",
   gray: "#e1e1e1",
   lightGray: "#737373",
@@ -133,7 +133,8 @@ const iswapTheme =  {
     MuiButton: {
       root: {
         borderRadius: '50px',
-        padding: '10px 24px'
+        padding: '10px 24px',
+        background: 'white'
       },
       outlined: {
         padding: '10px 24px',
@@ -204,7 +205,7 @@ const iswapTheme =  {
         marginRight: '0px'
       }
     },
-    MuiExpansionPanel: {
+    MuiAccordion: {
       root: {
         border: '1px solid '+colors.borderBlue,
         borderRadius: '50px',
@@ -225,7 +226,7 @@ const iswapTheme =  {
         },
       }
     },
-    MuiExpansionPanelSummary: {
+    MuiAccordianSummary: {
       root: {
         padding: '30px 42px'
       },
@@ -233,7 +234,7 @@ const iswapTheme =  {
         margin: '0px !important'
       }
     },
-    MuiExpansionPanelDetails: {
+    MuiAccordianDetails: {
       root: {
         padding: '0 12px 15px 12px',
         '@media (min-width: 960px)': {
@@ -246,6 +247,7 @@ const iswapTheme =  {
         borderRadius: '50px',
         textTransform: 'none',
         minWidth:  '100px',
+        background: 'white',
         border: 'none',
         '& > span > h4': {
           color: '#555',
@@ -277,9 +279,9 @@ const iswapTheme =  {
         border: '1px solid '+colors.borderBlue,
         borderRadius: '50px',
       },
-      groupedSizeSmall: {
-        padding: '42px 30px'
-      }
+      // groupedSizeSmall: {
+      //   padding: '42px 30px'
+      // }
     },
     MuiFormControlLabel: {
       label: {

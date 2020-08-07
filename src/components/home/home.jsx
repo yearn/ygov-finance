@@ -7,10 +7,8 @@ import {
 } from '@material-ui/core';
 import { withNamespaces } from 'react-i18next';
 import { colors } from '../../theme'
-import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
 import HowToVoteIcon from '@material-ui/icons/HowToVote';
-import WbIncandescentIcon from '@material-ui/icons/WbIncandescent';
-import DetailsIcon from '@material-ui/icons/Details';
+import DetailsIcon from '@material-ui/icons/ShowChart'; // Details
 
 const styles = theme => ({
   root: {
@@ -44,7 +42,7 @@ const styles = theme => ({
   earn: {
     backgroundColor: colors.white,
     '&:hover': {
-      backgroundColor: colors.pink,
+      backgroundColor: colors.blue,
       '& .title': {
         color: colors.white
       },
@@ -53,16 +51,16 @@ const styles = theme => ({
       }
     },
     '& .title': {
-      color: colors.pink
+      color: colors.blue
     },
     '& .icon': {
-      color: colors.pink
+      color: colors.blue
     }
   },
   zap: {
     backgroundColor: colors.white,
     '&:hover': {
-      backgroundColor: colors.blue,
+      backgroundColor: colors.blackBlue,
       '& .title': {
         color: colors.white,
       },
@@ -71,15 +69,15 @@ const styles = theme => ({
       }
     },
     '& .title': {
-      color: colors.blue,
+      color: colors.blackBlue,
       display: 'block'
     },
     '& .soon': {
-      color: colors.blue,
+      color: colors.blackBlue,
       display: 'none'
     },
     '& .icon': {
-      color: colors.blue
+      color: colors.blackBlue
     },
   },
   apr: {
@@ -175,14 +173,14 @@ const styles = theme => ({
 class Home extends Component {
 
   constructor(props) {
-    super()
+    super(props)
 
     this.state = {
     }
   }
 
   render() {
-    const { classes, t, location } = this.props;
+    const { classes, location } = this.props;
 
     return (
       <div className={ classes.root }>

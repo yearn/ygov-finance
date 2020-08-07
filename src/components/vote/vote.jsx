@@ -6,14 +6,12 @@ import {
   Box,
   Button,
   Card,
-  TextField,
-  ExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
 } from '@material-ui/core';
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
-import { withNamespaces } from 'react-i18next';
 
 import Loader from '../loader'
 import Snackbar from '../snackbar'
@@ -28,17 +26,11 @@ import { colors } from '../../theme'
 import {
   ERROR,
   CONFIGURE_RETURNED,
-  PROPOSE,
   PROPOSE_RETURNED,
   GET_PROPOSALS,
   GET_PROPOSALS_RETURNED,
   VOTE_FOR_RETURNED,
   VOTE_AGAINST_RETURNED,
-  GOVERNANCE_CONTRACT_CHANGED,
-  GET_VOTE_STATUS,
-  GET_VOTE_STATUS_RETURNED,
-  REGISTER_VOTE_RETURNED,
-  REGISTER_VOTE
 } from '../../constants'
 
 const styles = theme => ({
@@ -106,6 +98,9 @@ const styles = theme => ({
   buttonText: {
     fontWeight: '700',
     color: 'white',
+  },
+  instructions: {
+    textAlign: 'center',
   },
   disaclaimer: {
     padding: '12px',
@@ -202,7 +197,7 @@ const styles = theme => ({
   grey: {
     color: colors.darkGray
   },
-  expansionPanel: {
+  accordian: {
     maxWidth: 'calc(100vw - 24px)',
     width: '100%'
   },
@@ -243,36 +238,28 @@ const store = Store.store
 class Vote extends Component {
 
   constructor(props) {
-    super()
+    super(props)
 
     const account = store.getStore('account')
     const proposals = store.getStore('proposals')
-    const votingStatus = store.getStore('votingStatus')
-    const governanceContractVersion = store.getStore('governanceContractVersion')
 
     this.state = {
       loading: false,
       account: account,
       proposals: proposals,
-      value: 1,
-      votingStatus: votingStatus,
-      governanceContractVersion: governanceContractVersion
+      value: 0,
     }
 
     dispatcher.dispatch({ type: GET_PROPOSALS, content: {} })
-    dispatcher.dispatch({ type: GET_VOTE_STATUS, content: {} })
   }
 
-  componentWillMount() {
+  componentDidMount() {
     emitter.on(ERROR, this.errorReturned);
     emitter.on(CONFIGURE_RETURNED, this.configureReturned)
     emitter.on(PROPOSE_RETURNED, this.showHash)
     emitter.on(GET_PROPOSALS_RETURNED, this.proposalsReturned)
     emitter.on(VOTE_FOR_RETURNED, this.showHash);
     emitter.on(VOTE_AGAINST_RETURNED, this.showHash);
-    emitter.on(GOVERNANCE_CONTRACT_CHANGED, this.governanceContractChanged);
-    emitter.on(GET_VOTE_STATUS_RETURNED, this.voteStatusReturned);
-    emitter.on(REGISTER_VOTE_RETURNED, this.registerVoteReturned);
   }
 
   componentWillUnmount() {
@@ -282,34 +269,11 @@ class Vote extends Component {
     emitter.removeListener(GET_PROPOSALS_RETURNED, this.proposalsReturned)
     emitter.removeListener(VOTE_FOR_RETURNED, this.showHash);
     emitter.removeListener(VOTE_AGAINST_RETURNED, this.showHash);
-    emitter.removeListener(GOVERNANCE_CONTRACT_CHANGED, this.governanceContractChanged);
-    emitter.removeListener(GET_VOTE_STATUS_RETURNED, this.voteStatusReturned);
-    emitter.removeListener(REGISTER_VOTE_RETURNED, this.registerVoteReturned);
   };
 
-  governanceContractChanged = () => {
-    this.setState({ governanceContractVersion: store.getStore('governanceContractVersion'), loading: true })
-    dispatcher.dispatch({ type: GET_PROPOSALS, content: {} })
-  }
-
-  errorReturned = (error) => {
+  errorReturned = (_error) => {
     this.setState({ loading: false })
   };
-
-  registerVoteReturned = (txHash) => {
-    this.setState({
-      votingStatus: store.getStore('votingStatus'),
-      loading: false
-    })
-    this.showSnackbar(txHash, 'Hash')
-  };
-
-  voteStatusReturned = () => {
-    this.setState({
-      votingStatus: store.getStore('votingStatus'),
-      loading: false
-    })
-  }
 
   proposalsReturned = () => {
     const proposals = store.getStore('proposals')
@@ -345,12 +309,6 @@ class Vote extends Component {
       loading,
       modalOpen,
       snackbarMessage,
-      title,
-      titleError,
-      description,
-      descriptionError,
-      votingStatus,
-      governanceContractVersion
     } = this.state
 
     var address = null;
@@ -365,56 +323,31 @@ class Vote extends Component {
           <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
             <Typography variant={ 'h3'} className={ classes.walletTitle } noWrap>Wallet</Typography>
             <Typography variant={ 'h4'} className={ classes.walletAddress } noWrap>{ address }</Typography>
-            <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}></div>
+            <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}/>
           </Card>
-          <div className={ classes.between }>
-          </div>
+          <div className={classes.between}/>
           <div>
-            <Button
-              className={ classes.stakeButton }
-              variant="outlined"
-              color="secondary"
-              disabled={ loading }
-              onClick={ () => { this.goToDashboard() } }
-            >
-              <Typography variant={ 'h4'}>Go to Voting Dashboard</Typography>
+            <Button className={ classes.stakeButton } variant="outlined" color="secondary" disabled={ loading } onClick={ () => { this.goToDashboard() } }>
+              <Typography variant={ 'h4'}>Governance Forum Site</Typography>
             </Button>
           </div>
         </div>
         <div className={ classes.intro }>
           <ToggleButtonGroup value={value} onChange={this.handleTabChange} aria-label="version" exclusive size={ 'small' }>
             <ToggleButton value={0} aria-label="v1">
-              <Typography variant={ 'h4' }>Done</Typography>
+              <Typography variant={ 'h4' }>Memes</Typography>
             </ToggleButton>
             <ToggleButton value={1} aria-label="v2">
-              <Typography variant={ 'h4' }>Open</Typography>
+              <Typography variant={ 'h4' }>Gov</Typography>
             </ToggleButton>
           </ToggleButtonGroup>
           <div className={ classes.between }>
           </div>
-          <div className={ classes.proposalContainer }>
-            { (governanceContractVersion === 2 && votingStatus !== true) &&
-              <Button
-                className={ classes.stakeButton }
-                variant="outlined"
-                color="secondary"
-                disabled={ loading }
-                onClick={ () => { this.onRegister() } }
-              >
-                <Typography variant={ 'h4'}>Register to vote</Typography>
-              </Button>
-            }
-            { (governanceContractVersion === 1 || votingStatus === true) &&
-              <Button
-                className={ classes.stakeButton }
-                variant="outlined"
-                color="secondary"
-                disabled={ loading }
-                onClick={ () => { this.onPropose() } }
-              >
-                <Typography variant={ 'h4'}>Generate a new proposal</Typography>
-              </Button>
-            }
+          <div>
+            <Button className={ classes.stakeButton } variant="outlined" color="secondary" disabled={ loading } onClick={ () => { this.onPropose() } }>
+              <Typography variant={ 'h4'}>Generate a new proposal</Typography>
+            </Button>
+            <Typography className={classes.instructions }><a href="https://gov.yflink.io/t/voting-and-proposal-submission-instructions/30" target="_blank" rel="noopener noreferrer">Instructions</a></Typography>
           </div>
         </div>
         { this.renderProposals() }
@@ -427,14 +360,12 @@ class Vote extends Component {
 
   renderProposals = () => {
     const { proposals, expanded, value } = this.state
-    const { classes, t } = this.props
-    const width = window.innerWidth
-    const now = store.getStore('currentBlock')
+    const { classes } = this.props
+    // const now = store.getStore('currentBlock')
 
     const filteredProposals = proposals.filter((proposal) => {
-      return proposal.proposer != '0x0000000000000000000000000000000000000000'
-    }).filter((proposal) => {
-      return (value === 0 ? proposal.end < now : proposal.end > now)
+      const isGov = proposal.url.includes('?gov')
+      return (value === 0 ? !isGov : isGov)
     })
 
     if(filteredProposals.length === 0) {
@@ -446,14 +377,14 @@ class Vote extends Component {
     }
 
     return filteredProposals.map((proposal) => {
-      var address = null;
+      let address = null;
       if (proposal.proposer) {
         address = proposal.proposer.substring(0,8)+'...'+proposal.proposer.substring(proposal.proposer.length-6,proposal.proposer.length)
       }
 
       return (
-        <ExpansionPanel className={ classes.expansionPanel } square key={ proposal.id+"_expand" } expanded={ expanded === proposal.id} onChange={ () => { this.handleChange(proposal.id) } }>
-          <ExpansionPanelSummary
+        <Accordion className={ classes.accordian } square key={ proposal.id+"_expand" } expanded={ expanded === proposal.id} onChange={ () => { this.handleChange(proposal.id) } }>
+          <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls="panel1bh-content"
             id="panel1bh-header"
@@ -461,7 +392,7 @@ class Vote extends Component {
             <div className={ classes.assetSummary }>
               <div className={classes.headingName}>
                 <div className={ classes.assetIcon }>
-                  <Typography variant={ 'h3' }>{ proposal.id }</Typography>
+                  <Typography variant={ 'h3' }>#{ proposal.id }</Typography>
                 </div>
                 <div>
                   <div className={ classes.proposerAddressContainer }>
@@ -481,17 +412,17 @@ class Vote extends Component {
                 <Typography variant={ 'h5' } className={ classes.grey }>Votes Against { proposal.totalAgainstVotes !== "0" ? ((parseFloat(proposal.totalAgainstVotes)/10**18) / ((parseFloat(proposal.totalForVotes)/10**18) + (parseFloat(proposal.totalAgainstVotes)/10**18)) * 100).toFixed(2) : 0 }%</Typography>
               </div>
             </div>
-          </ExpansionPanelSummary>
-          <ExpansionPanelDetails>
+          </AccordionSummary>
+          <AccordionDetails>
             <Proposal proposal={ proposal } startLoading={ this.startLoading } showSnackbar={ this.showSnackbar } />
-          </ExpansionPanelDetails>
-        </ExpansionPanel>
+          </AccordionDetails>
+        </Accordion>
       )
     })
   }
 
   goToDashboard = () => {
-    window.open('https://gov.yearn.finance/', "_blank")
+    window.open('https://gov.yflink.io/', "_blank")
   }
 
   handleTabChange = (event, newValue) => {
@@ -521,11 +452,6 @@ class Vote extends Component {
 
   onPropose = () => {
     this.props.history.push('propose')
-  }
-
-  onRegister = () => {
-    this.setState({ loading: true })
-    dispatcher.dispatch({ type: REGISTER_VOTE, content: {  } })
   }
 
   renderModal = () => {

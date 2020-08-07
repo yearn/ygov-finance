@@ -1,38 +1,28 @@
-import React, { Component } from "react";
-import { withRouter } from "react-router-dom";
-import { withStyles } from '@material-ui/core/styles';
-import {
-  Typography,
-  Button,
-  Card,
-  TextField,
-  InputAdornment
-} from '@material-ui/core';
-import { withNamespaces } from 'react-i18next';
-
-import CheckIcon from '@material-ui/icons/Check';
-import ClearIcon from '@material-ui/icons/Clear';
+import bigInt from 'big-integer';
+import React, {Component} from "react";
+import {withRouter} from "react-router-dom";
+import {withStyles} from '@material-ui/core/styles';
+import {Button, Card, InputAdornment, TextField, Typography} from '@material-ui/core';
 
 import Loader from '../loader'
 import Snackbar from '../snackbar'
 
 import Store from "../../stores";
-import { colors } from '../../theme'
+import {colors} from '../../theme'
 
 import {
   ERROR,
-  CONFIGURE_RETURNED,
+  EXIT,
+  EXIT_RETURNED,
+  GET_BALANCES_RETURNED,
+  GET_REWARDS,
+  GET_REWARDS_RETURNED,
+  GET_GOV_REQUIREMENTS,
+  GET_GOV_REQUIREMENTS_RETURNED,
   STAKE,
   STAKE_RETURNED,
   WITHDRAW,
-  WITHDRAW_RETURNED,
-  GET_REWARDS,
-  GET_REWARDS_RETURNED,
-  EXIT,
-  EXIT_RETURNED,
-  GET_YCRV_REQUIREMENTS,
-  GET_YCRV_REQUIREMENTS_RETURNED,
-  GET_BALANCES_RETURNED
+  WITHDRAW_RETURNED
 } from '../../constants'
 
 const styles = theme => ({
@@ -226,6 +216,10 @@ const styles = theme => ({
   voteLockMessage: {
     margin: '20px'
   },
+  startDateMessage: {
+    margin: '20px',
+    fontStyle: 'italic',
+  },
   title: {
     width: '100%',
     color: colors.darkGray,
@@ -245,7 +239,6 @@ class Stake extends Component {
 
     const account = store.getStore('account')
     const pool = store.getStore('currentPool')
-    const governanceContractVersion = store.getStore('governanceContractVersion')
 
     if(!pool) {
       props.history.push('/')
@@ -259,21 +252,20 @@ class Stake extends Component {
       voteLockValid: false,
       balanceValid: false,
       voteLock: null,
-      governanceContractVersion: governanceContractVersion
     }
 
-    if(pool && ['FeeRewards', 'Governance'].includes(pool.id)) {
-      dispatcher.dispatch({ type: GET_YCRV_REQUIREMENTS, content: {} })
+    if(pool && pool.id.startsWith('gov')) {
+      dispatcher.dispatch({ type: GET_GOV_REQUIREMENTS, content: {} })
     }
   }
 
-  componentWillMount() {
+  componentDidMount() {
     emitter.on(ERROR, this.errorReturned);
     emitter.on(STAKE_RETURNED, this.showHash);
     emitter.on(WITHDRAW_RETURNED, this.showHash);
     emitter.on(EXIT_RETURNED, this.showHash);
     emitter.on(GET_REWARDS_RETURNED, this.showHash);
-    emitter.on(GET_YCRV_REQUIREMENTS_RETURNED, this.yCrvRequirementsReturned);
+    emitter.on(GET_GOV_REQUIREMENTS_RETURNED, this.govRequirementsReturned);
     emitter.on(GET_BALANCES_RETURNED, this.balancesReturned);
   }
 
@@ -283,7 +275,7 @@ class Stake extends Component {
     emitter.removeListener(WITHDRAW_RETURNED, this.showHash);
     emitter.removeListener(EXIT_RETURNED, this.showHash);
     emitter.removeListener(GET_REWARDS_RETURNED, this.showHash);
-    emitter.removeListener(GET_YCRV_REQUIREMENTS_RETURNED, this.yCrvRequirementsReturned);
+    emitter.removeListener(GET_GOV_REQUIREMENTS_RETURNED, this.govRequirementsReturned);
     emitter.removeListener(GET_BALANCES_RETURNED, this.balancesReturned);
   };
 
@@ -300,7 +292,7 @@ class Stake extends Component {
     }
   }
 
-  yCrvRequirementsReturned = (requirements) => {
+  govRequirementsReturned = (requirements) => {
     this.setState({
       balanceValid: requirements.balanceValid,
       voteLockValid: requirements.voteLockValid,
@@ -333,7 +325,6 @@ class Stake extends Component {
     const {
       value,
       account,
-      modalOpen,
       pool,
       loading,
       snackbarMessage,
@@ -350,6 +341,7 @@ class Stake extends Component {
       return null
     }
 
+    const token = pool.tokens[0];
     return (
       <div className={ classes.root }>
         <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
@@ -366,39 +358,28 @@ class Stake extends Component {
           <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
             <Typography variant={ 'h3'} className={ classes.walletTitle } noWrap>Wallet</Typography>
             <Typography variant={ 'h4'} className={ classes.walletAddress } noWrap>{ address }</Typography>
-            <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}></div>
+            <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}/>
           </Card>
         </div>
         <div className={ classes.overview }>
           <div className={ classes.overviewField }>
             <Typography variant={ 'h3' } className={ classes.overviewTitle }>Your Balance</Typography>
-            <Typography variant={ 'h2' } className={ classes.overviewValue }>{ pool.tokens[0].balance ? pool.tokens[0].balance.toFixed(2) : "0" }  { pool.tokens[0].symbol }</Typography>
+            <Typography variant={ 'h2' } className={ classes.overviewValue }>{ token.balance ? toFixed(token.balance, token.decimals, 6) : "0" }  { token.symbol }</Typography>
           </div>
           <div className={ classes.overviewField }>
             <Typography variant={ 'h3' } className={ classes.overviewTitle }>Currently Staked</Typography>
-            <Typography variant={ 'h2' } className={ classes.overviewValue }>{ pool.tokens[0].stakedBalance ? pool.tokens[0].stakedBalance.toFixed(2) : "0" }</Typography>
+            <Typography variant={ 'h2' } className={ classes.overviewValue }>{ token.stakedBalance ? toFixed(token.stakedBalance, token.decimals, 6) : "0" }</Typography>
           </div>
-          <div className={ classes.overviewField }>
-            <Typography variant={ 'h3' } className={ classes.overviewTitle }>Rewards Available</Typography>
-            <Typography variant={ 'h2' } className={ classes.overviewValue }>{ pool.tokens[0].rewardsSymbol == '$' ? pool.tokens[0].rewardsSymbol : '' } { pool.tokens[0].rewardsAvailable ? pool.tokens[0].rewardsAvailable.toFixed(2) : "0" } { pool.tokens[0].rewardsSymbol != '$' ? pool.tokens[0].rewardsSymbol : '' }</Typography>
+          {token.rewardsSymbol &&
+          <div className={classes.overviewField}>
+            <Typography variant={'h3'} className={classes.overviewTitle}>Rewards Available</Typography>
+            <Typography variant={'h2'} className={classes.overviewValue}>{token.rewardsSymbol === '$' ? token.rewardsSymbol : ''} {token.rewardsAvailable ? toFixed(token.rewardsAvailable, token.decimals, 6) : "0"} {token.rewardsSymbol !== '$' ? token.rewardsSymbol : ''}</Typography>
           </div>
+          }
         </div>
-        { ['FeeRewards'].includes(pool.id) &&
-          <div className={ classes.actions }>
-            <Typography className={ classes.stakeTitle } variant={ 'h3'}>yCRV reward requirements</Typography>
-            <div className={ classes.requirement }>
-              <Typography variant={'h4'}>You must have voted in a proposal recently</Typography><Typography variant={'h4'} className={ classes.check }>{ voteLockValid ? <CheckIcon style={{ color: colors.green }} /> : <ClearIcon style={{ color: colors.red }} /> }</Typography>
-            </div>
-            <div className={ classes.requirement }>
-              <Typography variant={'h4'}>You must have at least 1000 BPT staked in the Governance pool</Typography><Typography variant={'h4'} className={ classes.check }>{ balanceValid ? <CheckIcon style={{ color: colors.green }} /> : <ClearIcon style={{ color: colors.red }} /> }</Typography>
-            </div>
-          </div>
-        }
         { value === 'options' && this.renderOptions() }
         { value === 'stake' && this.renderStake() }
-        { value === 'claim' && this.renderClaim() }
         { value === 'unstake' && this.renderUnstake() }
-        { value === 'exit' && this.renderExit() }
 
         { snackbarMessage && this.renderSnackbar() }
         { loading && <Loader /> }
@@ -419,12 +400,13 @@ class Stake extends Component {
             className={ classes.primaryButton }
             variant="outlined"
             color="primary"
-            disabled={ !pool.depositsEnabled || (['FeeRewards'].includes(pool.id) ?  (loading || !voteLockValid || !balanceValid) : loading) }
+            disabled={ !pool.depositsEnabled || (pool.id.startsWith('gov') ?  (loading || voteLockValid || !balanceValid) : loading) }
             onClick={ () => { this.navigateInternal('stake') } }
             >
             <Typography className={ classes.stakeButtonText } variant={ 'h4'}>Stake Tokens</Typography>
           </Button>
         </div>
+        {pool.tokens[0].rewardsSymbol &&
         <div className={ classes.actionContainer}>
           <Button
             fullWidth
@@ -437,31 +419,38 @@ class Stake extends Component {
             <Typography className={ classes.buttonText } variant={ 'h4'}>Claim Rewards</Typography>
           </Button>
         </div>
+        }
         <div className={ classes.actionContainer}>
           <Button
             fullWidth
             className={ classes.actionButton }
             variant="outlined"
             color="primary"
-            disabled={ (pool.id === 'Governance' ? (loading || voteLockValid ) : loading  ) }
+            disabled={ (pool.id.startsWith('gov') ? (loading || voteLockValid ) : loading  ) }
             onClick={ () => { this.navigateInternal('unstake') } }
             >
             <Typography className={ classes.buttonText } variant={ 'h4'}>Unstake Tokens</Typography>
           </Button>
         </div>
-        <div className={ classes.actionContainer}>
+        {pool.tokens[0].rewardsSymbol &&
+        <div className={classes.actionContainer}>
           <Button
-            fullWidth
-            className={ classes.actionButton }
-            variant="outlined"
-            color="primary"
-            disabled={ (pool.id === 'Governance' ? (loading || voteLockValid ) : loading  ) }
-            onClick={ () => { this.onExit() } }
-            >
-            <Typography className={ classes.buttonText } variant={ 'h4'}>Exit: Claim and Unstake</Typography>
+              fullWidth
+              className={classes.actionButton}
+              variant="outlined"
+              color="primary"
+              disabled={(pool.id.startsWith('gov') ? (loading || voteLockValid) : loading)}
+              onClick={() => {
+                this.onExit()
+              }}
+          >
+            <Typography className={classes.buttonText} variant={'h4'}>Exit: Claim and Unstake</Typography>
           </Button>
         </div>
-        { (pool.id === 'Governance' && voteLockValid) && <Typography variant={'h4'} className={ classes.voteLockMessage }>Unstaking tokens only allowed once all your pending votes have closed at Block: {voteLock}</Typography>}
+        }
+        { pool.startDate && <Typography className={ classes.startDateMessage }>Launching: {pool.startDate.format("ddd MMM D, HH:mm")}</Typography>}
+        { (pool.id.startsWith('gov') && !voteLockValid) && <Typography variant={'h4'} className={ classes.voteLockMessage }>Unstake at any time until you vote; voting locks tokens for voting period (up to 3 days).</Typography>}
+        { (pool.id.startsWith('gov') && voteLockValid) && <Typography variant={'h4'} className={ classes.voteLockMessage }>Unstaking allowed once pending votes close at block {voteLock}.</Typography>}
       </div>
     )
   }
@@ -529,7 +518,7 @@ class Stake extends Component {
             className={ classes.stakeButton }
             variant="outlined"
             color="secondary"
-            disabled={ (pool.id === 'Governance' ? (loading || voteLockValid ) : loading  ) }
+            disabled={ (pool.id.startsWith('gov') ? (loading || voteLockValid ) : loading  ) }
             onClick={ () => { this.onUnstake() } }
           >
             <Typography variant={ 'h4'}>Unstake</Typography>
@@ -551,16 +540,17 @@ class Stake extends Component {
   onStake = () => {
     this.setState({ amountError: false })
     const { pool } = this.state
-    const tokens = pool.tokens
-    const selectedToken = tokens[0]
-    const amount = this.state[selectedToken.id + '_stake']
-
+    const asset = pool.tokens[0]
+    const amountString = this.state[asset.id + '_stake']
+    // Using toString() here seems to magically render trailing zeros past the point of significance,
+    // while toFixed() renders the nearest number.
+    const amount = bigInt((parseFloat(amountString) * 10**asset.decimals).toString())
     // if(amount > selectedToken.balance) {
     //   return false
     // }
 
     this.setState({ loading: true })
-    dispatcher.dispatch({ type: STAKE, content: { asset: selectedToken, amount: amount } })
+    dispatcher.dispatch({ type: STAKE, content: { asset: asset, amount: amount } })
   }
 
   onClaim = () => {
@@ -575,16 +565,16 @@ class Stake extends Component {
   onUnstake = () => {
     this.setState({ amountError: false })
     const { pool } = this.state
-    const tokens = pool.tokens
-    const selectedToken = tokens[0]
-    const amount = this.state[selectedToken.id + '_unstake']
+    const asset = pool.tokens[0]
+    const amountString = this.state[asset.id + '_unstake']
+    const amount = bigInt((parseFloat(amountString) * 10**asset.decimals).toString())
     //
     // if(amount > selectedToken.balance) {
     //   return false
     // }
 
     this.setState({ loading: true })
-    dispatcher.dispatch({ type: WITHDRAW, content: { asset: selectedToken, amount: amount } })
+    dispatcher.dispatch({ type: WITHDRAW, content: { asset: asset, amount: amount } })
   }
 
   onExit = () => {
@@ -611,8 +601,8 @@ class Stake extends Component {
     return (
       <div className={ classes.valContainer } key={asset.id + '_' + type}>
         <div className={ classes.balances }>
-          { type === 'stake' && <Typography variant='h4' onClick={ () => { this.setAmount(asset.id, type, (asset ? asset.balance : 0)) } } className={ classes.value } noWrap>{ 'Balance: '+ ( asset && asset.balance ? (Math.floor(asset.balance*10000)/10000).toFixed(4) : '0.0000') } { asset ? asset.symbol : '' }</Typography> }
-          { type === 'unstake' && <Typography variant='h4' onClick={ () => { this.setAmount(asset.id, type, (asset ? asset.stakedBalance : 0)) } } className={ classes.value } noWrap>{ 'Balance: '+ ( asset && asset.stakedBalance ? (Math.floor(asset.stakedBalance*10000)/10000).toFixed(4) : '0.0000') } { asset ? asset.symbol : '' }</Typography> }
+          { type === 'stake' && <Typography variant='h4' onClick={ () => { this.setAmount(asset.id, type, (asset ? asset.balance : bigInt())) } } className={ classes.value } noWrap>{ 'Balance: '+ ( asset && asset.balance ? toFixed(asset.balance, asset.decimals, 6) : '0') } { asset ? asset.symbol : '' }</Typography> }
+          { type === 'unstake' && <Typography variant='h4' onClick={ () => { this.setAmount(asset.id, type, (asset ? asset.stakedBalance : bigInt())) } } className={ classes.value } noWrap>{ 'Balance: '+ ( asset && asset.stakedBalance ? toFixed(asset.stakedBalance, asset.decimals, 6) : '0') } { asset ? asset.symbol : '' }</Typography> }
         </div>
         <div>
           <TextField
@@ -658,12 +648,17 @@ class Stake extends Component {
   }
 
   setAmount = (id, type, balance) => {
-    const bal = (Math.floor((balance === '' ? '0' : balance)*10000)/10000).toFixed(4)
+    const bal = toFixed(balance, 18, 6)
     let val = []
     val[id + '_' + type] = bal
     this.setState(val)
   }
+}
 
+function toFixed(bi, decimals, desired) {
+  const trunc = decimals - desired
+  const shift = decimals - trunc
+  return (bi.divide(10**trunc).toJSNumber() / (10**shift)).toFixed(desired)
 }
 
 export default withRouter(withStyles(styles)(Stake));

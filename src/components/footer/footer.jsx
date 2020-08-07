@@ -1,46 +1,37 @@
-import React, { Component } from "react";
-import { withRouter } from "react-router-dom";
-import { withStyles } from '@material-ui/core/styles';
-import {
-  Typography,
-  Select,
-  MenuItem,
-  FormControl
-} from '@material-ui/core';
-import {
-  Link
-} from "react-router-dom";
-import { withNamespaces } from 'react-i18next';
-import i18n from '../../i18n';
-import { colors } from '../../theme'
+import React, {Component} from "react";
+import {Link, withRouter} from "react-router-dom";
+import {withStyles} from '@material-ui/core/styles';
+import {Typography,} from '@material-ui/core';
+import {withNamespaces} from 'react-i18next';
+import {colors} from '../../theme'
 
 import Store from "../../stores";
+
 const store = Store.store
 
 const styles = theme => ({
   footer: {
-    position: 'absolute',
     top: '0px',
-    padding: '24px',
+    paddingTop: '28px',
     display: 'flex',
     flexWrap: 'wrap',
-    justifyContent: 'flex-end',
     width: '100%',
-    alignItems: 'center',
     [theme.breakpoints.up('sm')]: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       width: '100%',
-      alignItems: 'center',
     }
   },
   footerLinks: {
     display: 'flex',
     flexWrap: 'wrap',
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    maxWidth: '420px'
+    // width: '100%',
+  },
+  footerLinksRight: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    flexDirection: 'row',
   },
   footerText: {
     cursor: 'pointer'
@@ -54,7 +45,8 @@ const styles = theme => ({
     color: colors.pink
   },
   link: {
-    textDecoration: 'none'
+    padding: '0 16px 0 16px',
+    textDecoration: 'none',
   }
 });
 
@@ -62,27 +54,56 @@ const styles = theme => ({
 class Footer extends Component {
 
   constructor(props) {
-    super()
+    super(props)
 
     this.state = {
+      rewardPools: store.getStore('rewardPools'),
       languages: store.getStore('languages'),
       language: 'en',
     }
   }
 
   render() {
-    const { classes, t, location } = this.props;
-    const {
-    } = this.state
+    const {classes} = this.props;
+    const {rewardPools} = this.state
 
     return (
-      <div className={classes.footer}>
-        <div className={classes.footerLinks}>
-          <Link to={"/"} className={ classes.link }>
-            <Typography className={ classes.footerText } variant={ 'h6'}>Home</Typography>
-          </Link>
-        </div>
-      </div>
+        <div className={classes.footer}>
+          <div className={classes.footerLinks}>
+            <Link to={"/"} className={classes.link}>
+              <Typography className={classes.footerText} variant={'h6'}>Home</Typography>
+            </Link>
+            <a href="https://discord.gg/ChPr4NA" className={classes.link} target="_blank" rel="noopener noreferrer">
+              <Typography className={classes.footerText} variant="h6">Discord</Typography>
+            </a>
+            <a href="https://gov.yflink.io" className={classes.link} target="_blank" rel="noopener noreferrer">
+              <Typography className={classes.footerText} variant="h6">Forum</Typography>
+            </a>
+            <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTYE7Y-qu1VZC7F_dmxPYVq9N1vJVx0QJTI4v8kOHkKu1L8bDGrT2_wDc1FEm_DQaSi_QdTkoMZO6Ry/pubhtml" className={classes.link} target="_blank" rel="noopener noreferrer">
+              <Typography className={classes.footerText} variant="h6">YFL emission schedule</Typography>
+            </a>
+            {
+              rewardPools.filter(p => !!p.yieldCalculator).map((rewardPool) => {
+                return <a href={rewardPool.yieldCalculator} className={classes.link} key={rewardPool.id} target="_blank" rel="noopener noreferrer">
+                  <Typography className={classes.footerText} variant={'h6'}>
+                    {rewardPool.name} Yield
+                  </Typography>
+                </a>
+              })
+            }
+            <a href="https://burn.yflink.io" className={classes.link} target="_blank" rel="noopener noreferrer">
+              <Typography className={classes.footerText} variant="h6">Burn</Typography>
+            </a>
+          </div>
+          <div className={classes.footerLinksRight}>
+            <a href="https://medium.com/yflink" className={classes.link} target="_blank" rel="noopener noreferrer">
+              <img src={require('../../assets/mediumlogo.png')} alt='Medium' height='24px'/>
+            </a>
+            <a href="https://twitter.com/yflinkio" className={classes.link} target="_blank" rel="noopener noreferrer">
+              <img src={require('../../assets/twitterlogo.png')} alt='Twitter' height='24px'/>
+            </a>
+          </div>
+          </div>
     )
   }
 }

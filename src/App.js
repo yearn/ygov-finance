@@ -3,9 +3,9 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import {
   Switch,
+  HashRouter,
   Route
 } from "react-router-dom";
-import IpfsRouter from 'ipfs-react-router'
 
 import './i18n';
 import interestTheme from './theme';
@@ -15,11 +15,8 @@ import Footer from './components/footer';
 import Home from './components/home';
 import Stake from './components/stake';
 import RewardsPools from './components/rewardPools';
-import Header from './components/header';
 import Propose from './components/propose';
-import Claim from './components/claim';
 import Vote from './components/vote';
-import VersionToggle from './components/versionToggle';
 
 import {
   CONNECTION_CONNECTED,
@@ -40,14 +37,14 @@ const store = Store.store
 class App extends Component {
   state = {
     account: null,
-    headerValue: null
+    // headerValue: null
   };
 
-  setHeaderValue = (newValue) => {
-    this.setState({ headerValue: newValue })
-  };
+  // setHeaderValue = (newValue) => {
+  //   this.setState({ headerValue: newValue })
+  // };
 
-  componentWillMount() {
+  componentDidMount() {
     emitter.on(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
     emitter.on(CONFIGURE_RETURNED, this.configureReturned);
@@ -59,13 +56,11 @@ class App extends Component {
         .then((a) => {
           store.setStore({ account: { address: a.account }, web3context: { library: { provider: a.provider } } })
           emitter.emit(CONNECTION_CONNECTED)
-          console.log(a)
+          // console.log(a)
         })
-        .catch((e) => {
-          console.log(e)
+        .catch((_e) => {
+          // console.log(e)
         })
-      } else {
-
       }
     });
   }
@@ -98,12 +93,12 @@ class App extends Component {
 
   render() {
 
-    const { headerValue, account } = this.state
+    const { account } = this.state
 
     return (
       <MuiThemeProvider theme={ createMuiTheme(interestTheme) }>
         <CssBaseline />
-        <IpfsRouter>
+        <HashRouter>
           { !account &&
             <div style={{
               display: 'flex',
@@ -112,7 +107,6 @@ class App extends Component {
               minWidth: '100vw',
               justifyContent: 'center',
               alignItems: 'center',
-              background: "#f9fafb"
             }}>
               <Account />
             </div>
@@ -124,7 +118,6 @@ class App extends Component {
               minHeight: '100vh',
               justifyContent: 'center',
               alignItems: 'center',
-              background: "#f9fafb"
             }}>
               <Switch>
                 <Route path="/stake">
@@ -132,17 +125,14 @@ class App extends Component {
                   <Stake />
                 </Route>
                 <Route path="/staking">
-                  <VersionToggle />
                   <Footer />
                   <RewardsPools />
                 </Route>
                 <Route path="/vote">
-                  <VersionToggle />
                   <Footer />
                   <Vote />
                 </Route>
                 <Route path="/propose">
-                  <VersionToggle />
                   <Footer />
                   <Propose />
                 </Route>
@@ -152,7 +142,7 @@ class App extends Component {
               </Switch>
             </div>
           }
-        </IpfsRouter>
+        </HashRouter>
       </MuiThemeProvider>
     );
   }
