@@ -335,10 +335,10 @@ class Vote extends Component {
         <div className={ classes.intro }>
           <ToggleButtonGroup value={value} onChange={this.handleTabChange} aria-label="version" exclusive size={ 'small' }>
             <ToggleButton value={0} aria-label="v1">
-              <Typography variant={ 'h4' }>Memes</Typography>
+              <Typography variant={ 'h4' }>Gov</Typography>
             </ToggleButton>
             <ToggleButton value={1} aria-label="v2">
-              <Typography variant={ 'h4' }>Gov</Typography>
+              <Typography variant={ 'h4' }>Memes</Typography>
             </ToggleButton>
           </ToggleButtonGroup>
           <div className={ classes.between }>
@@ -364,8 +364,8 @@ class Vote extends Component {
     // const now = store.getStore('currentBlock')
 
     const filteredProposals = proposals.filter((proposal) => {
-      const isGov = proposal.url.includes('?gov')
-      return (value === 0 ? !isGov : isGov)
+      const isMeme = proposal.url.includes('?meme')
+      return (value === 0 ? !isMeme : isMeme)
     })
 
     if(filteredProposals.length === 0) {
