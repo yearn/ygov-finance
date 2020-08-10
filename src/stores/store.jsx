@@ -192,7 +192,7 @@ class Store {
           website: 'Balancer Pool',
           link: 'https://pools.balancer.exchange/#/pool/' + config.pool2StakeAddress,
           instructionsLink: 'https://gov.yflink.io/t/mining-yfl-in-pool-2-ycrv-yfl-balancer/26',
-          // yieldCalculator: "https://yieldfarming.yflink.io/yflink/pool2",
+          yieldCalculator: "https://yieldfarming.yflink.io/yflink/pool2",
           depositsEnabled: true,
           startDate: config.pool2StartDate,
           tokens: [
@@ -218,7 +218,7 @@ class Store {
           website: 'Balancer Pool',
           link: 'https://pools.balancer.exchange/#/pool/' + config.pool3StakeAddress,
           instructionsLink: 'https://gov.yflink.io/t/mining-yfl-in-pool-3-alink-yfl-balancer/27',
-          // yieldCalculator: "https://yieldfarming.yflink.io/yflink/pool3",
+          yieldCalculator: "https://yieldfarming.yflink.io/yflink/pool3",
           depositsEnabled: true,
           startDate: config.pool3StartDate,
           tokens: [
