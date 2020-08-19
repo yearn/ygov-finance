@@ -76,6 +76,9 @@ class Footer extends Component {
             <a href="https://discord.gg/ChPr4NA" className={classes.link} target="_blank" rel="noopener noreferrer">
               <Typography className={classes.footerText} variant="h6">Discord</Typography>
             </a>
+            <a href="https://t.me/YFLinkGroup" className={classes.link} target="_blank" rel="noopener noreferrer">
+              <Typography className={classes.footerText} variant="h6">Telegram</Typography>
+            </a>
             <a href="https://gov.yflink.io" className={classes.link} target="_blank" rel="noopener noreferrer">
               <Typography className={classes.footerText} variant="h6">Forum</Typography>
             </a>
@@ -86,7 +89,7 @@ class Footer extends Component {
               rewardPools.filter(p => !!p.yieldCalculator).map((rewardPool) => {
                 return <a href={rewardPool.yieldCalculator} className={classes.link} key={rewardPool.id} target="_blank" rel="noopener noreferrer">
                   <Typography className={classes.footerText} variant={'h6'}>
-                    {rewardPool.name} Yield
+                    {rewardPool.title} Yield
                   </Typography>
                 </a>
               })

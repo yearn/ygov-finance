@@ -118,7 +118,7 @@ class Store {
           website: 'ChainLink Token',
           link: 'https://etherscan.io/token/' + config.pool0StakeAddress,
           instructionsLink: 'https://gov.yflink.io/t/mining-yfl-in-pool-0-link/24',
-          yieldCalculator: "https://yieldfarming.yflink.io/yflink/pool0",
+          // yieldCalculator: "https://yieldfarming.yflink.io/yflink/pool0",
           depositsEnabled: true,
           tokens: [
             {
@@ -143,7 +143,7 @@ class Store {
           website: 'Balancer Pool',
           link: 'https://pools.balancer.exchange/#/pool/' + config.pool1StakeAddress,
           instructionsLink: 'https://gov.yflink.io/t/mining-yfl-in-pool-1-link-yfl-balancer/25',
-          yieldCalculator: "https://yieldfarming.yflink.io/yflink/pool1",
+          // yieldCalculator: "https://yieldfarming.yflink.io/yflink/pool1",
           depositsEnabled: true,
           tokens: [
             {
