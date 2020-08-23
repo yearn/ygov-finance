@@ -275,7 +275,7 @@ class Proposal extends Component {
               <Typography variant={ 'h5' } className={ classes.grey }>Link</Typography>
             </div>
             <div>
-              <Typography variant={ 'h3' }>{ proposal.quorum } / { proposal.quorumRequired }</Typography>
+              <Typography variant={ 'h3' }>{ (proposal.quorum / 100).toFixed(2) }% / { (proposal.quorumRequired / 100).toFixed(2) }%</Typography>
               <Typography variant={ 'h5' } className={ classes.grey }>Quorum/Required</Typography>
             </div>
           </div>
