@@ -276,7 +276,12 @@ class RewardPools extends Component {
         Contract: <a href={'https://etherscan.io/address/' + addy} target="_blank" rel="noopener noreferrer">{address}</a>
       </Typography>
       <Button variant="outlined" color="secondary" onClick={() => {if (rewardPool.tokens.length > 0) {this.navigateStake(rewardPool)}}}>
-        <Typography variant={'h4'}>{rewardPool.id === 'gov' ? 'Stake' : openingSoon ? 'Opening Soon' : 'Mine $YFL'}</Typography>
+        <Typography variant={'h4'}>{
+          rewardPool.depositsEnabled === false ? 'Rewards exhausted' :
+              openingSoon ? 'Opening Soon' :
+                  rewardPool.id.startsWith('gov') ? 'Stake' :
+                      'Mine $YFL'
+        }</Typography>
       </Button>
       {openingSoon &&
       <Typography className={classes.timestamp}>
