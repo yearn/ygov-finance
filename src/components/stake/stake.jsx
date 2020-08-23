@@ -32,6 +32,8 @@ import {
   EXIT_RETURNED,
   GET_YCRV_REQUIREMENTS,
   GET_YCRV_REQUIREMENTS_RETURNED,
+  GET_GOVERNANCE_REQUIREMENTS,
+  GET_GOVERNANCE_REQUIREMENTS_RETURNED,
   GET_BALANCES_RETURNED
 } from '../../constants'
 
@@ -265,6 +267,10 @@ class Stake extends Component {
     if(pool && ['FeeRewards', 'Governance'].includes(pool.id)) {
       dispatcher.dispatch({ type: GET_YCRV_REQUIREMENTS, content: {} })
     }
+
+    if(pool && ['GovernanceV2'].includes(pool.id)) {
+      dispatcher.dispatch({ type: GET_GOVERNANCE_REQUIREMENTS, content: {} })
+    }
   }
 
   componentWillMount() {
@@ -274,6 +280,7 @@ class Stake extends Component {
     emitter.on(EXIT_RETURNED, this.showHash);
     emitter.on(GET_REWARDS_RETURNED, this.showHash);
     emitter.on(GET_YCRV_REQUIREMENTS_RETURNED, this.yCrvRequirementsReturned);
+    emitter.on(GET_GOVERNANCE_REQUIREMENTS_RETURNED, this.govRequirementsReturned);
     emitter.on(GET_BALANCES_RETURNED, this.balancesReturned);
   }
 
@@ -284,6 +291,7 @@ class Stake extends Component {
     emitter.removeListener(EXIT_RETURNED, this.showHash);
     emitter.removeListener(GET_REWARDS_RETURNED, this.showHash);
     emitter.removeListener(GET_YCRV_REQUIREMENTS_RETURNED, this.yCrvRequirementsReturned);
+    emitter.removeListener(GET_GOVERNANCE_REQUIREMENTS_RETURNED, this.govRequirementsReturned);
     emitter.removeListener(GET_BALANCES_RETURNED, this.balancesReturned);
   };
 
@@ -305,6 +313,13 @@ class Stake extends Component {
       balanceValid: requirements.balanceValid,
       voteLockValid: requirements.voteLockValid,
       voteLock: requirements.voteLock
+    })
+  }
+
+  govRequirementsReturned = (requirements) => {
+    this.setState({
+      gov_voteLockValid: requirements.voteLockValid,
+      gov_voteLock: requirements.voteLock
     })
   }
 
@@ -338,7 +353,9 @@ class Stake extends Component {
       loading,
       snackbarMessage,
       voteLockValid,
-      balanceValid
+      balanceValid,
+      gov_voteLock,
+      gov_voteLockValid
     } = this.state
 
     var address = null;
@@ -408,7 +425,15 @@ class Stake extends Component {
 
   renderOptions = () => {
     const { classes } = this.props;
-    const { loading, pool, voteLockValid, balanceValid, voteLock } = this.state
+    const {
+      loading,
+      pool,
+      voteLockValid,
+      balanceValid,
+      voteLock,
+      gov_voteLockValid,
+      gov_voteLock,
+    } = this.state
 
     return (
       <div className={ classes.actions }>
@@ -431,7 +456,7 @@ class Stake extends Component {
             className={ classes.actionButton }
             variant="outlined"
             color="primary"
-            disabled={ loading || (['GovernanceV2'].includes(pool.id) && !voteLock) }
+            disabled={ loading || (['GovernanceV2'].includes(pool.id) && !gov_voteLockValid) }
             onClick={ () => { this.onClaim() } }
             >
             <Typography className={ classes.buttonText } variant={ 'h4'}>Claim Rewards</Typography>
@@ -443,7 +468,7 @@ class Stake extends Component {
             className={ classes.actionButton }
             variant="outlined"
             color="primary"
-            disabled={ (pool.id === 'Governance' ? (loading || voteLockValid ) : loading  ) }
+            disabled={ loading  || (['GovernanceV2'].includes(pool.id) && gov_voteLockValid) || (pool.id === 'Governance' && (voteLockValid )) }
             onClick={ () => { this.navigateInternal('unstake') } }
             >
             <Typography className={ classes.buttonText } variant={ 'h4'}>Unstake Tokens</Typography>
@@ -464,7 +489,8 @@ class Stake extends Component {
           }
         </div>
         { (['Governance', 'GovernanceV2'].includes(pool.id) && voteLockValid) && <Typography variant={'h4'} className={ classes.voteLockMessage }>Unstaking tokens only allowed once all your pending votes have closed at Block: {voteLock}</Typography> }
-        { (['GovernanceV2'].includes(pool.id) && !voteLock) && <Typography variant={'h4'} className={ classes.voteLockMessage }>You need to have voted in order to claim rewards</Typography> }
+        { (['GovernanceV2'].includes(pool.id) && !gov_voteLockValid) && <Typography variant={'h4'} className={ classes.voteLockMessage }>You need to have voted recently in order to claim rewards</Typography> }
+        { (['GovernanceV2'].includes(pool.id) && gov_voteLockValid) && <Typography variant={'h4'} className={ classes.voteLockMessage }>You have recently voted, you can unstake at block {gov_voteLock}</Typography> }
       </div>
     )
   }

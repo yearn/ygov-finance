@@ -33,6 +33,8 @@ import {
   GET_CLAIMABLE_RETURNED,
   GET_YCRV_REQUIREMENTS,
   GET_YCRV_REQUIREMENTS_RETURNED,
+  GET_GOVERNANCE_REQUIREMENTS,
+  GET_GOVERNANCE_REQUIREMENTS_RETURNED,
   REGISTER_VOTE,
   REGISTER_VOTE_RETURNED,
   GET_VOTE_STATUS,
@@ -290,6 +292,8 @@ class Store {
           case GET_YCRV_REQUIREMENTS:
             this.getYCRVRequirements(payload)
             break;
+          case GET_GOVERNANCE_REQUIREMENTS:
+            this.getGovernanceV2Requirements(payload)
           default: {
           }
         }
@@ -1208,6 +1212,28 @@ class Store {
       }
 
       emitter.emit(GET_YCRV_REQUIREMENTS_RETURNED, returnOBJ)
+
+    } catch(ex) {
+      return emitter.emit(ERROR, ex);
+    }
+  }
+
+  getGovernanceV2Requirements = async (payload) => {
+    try {
+      const account = store.getStore('account')
+      const web3 = new Web3(store.getStore('web3context').library.provider);
+
+      const governanceContract = new web3.eth.Contract(config.governanceV2ABI,config.governanceV2Address)
+
+      const voteLock = await governanceContract.methods.voteLock(account.address).call({ from: account.address })
+      const currentBlock = await web3.eth.getBlockNumber()
+
+      const returnOBJ = {
+        voteLockValid: voteLock > currentBlock,
+        voteLock: voteLock
+      }
+
+      emitter.emit(GET_GOVERNANCE_REQUIREMENTS_RETURNED, returnOBJ)
 
     } catch(ex) {
       return emitter.emit(ERROR, ex);
