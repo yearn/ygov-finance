@@ -14,6 +14,7 @@ import Account from './components/account';
 import Footer from './components/footer';
 import Home from './components/home';
 import Stake from './components/stake';
+import Wrap from './components/wrap';
 import RewardsPools from './components/rewardPools';
 import Propose from './components/propose';
 import Vote from './components/vote';
@@ -123,6 +124,10 @@ class App extends Component {
                 <Route path="/stake">
                   <Footer />
                   <Stake />
+                </Route>
+                <Route path="/wrap">
+                  <Footer />
+                  <Wrap />
                 </Route>
                 <Route path="/staking">
                   <Footer />

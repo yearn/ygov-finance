@@ -213,8 +213,12 @@ const styles = theme => ({
   check: {
     paddingTop: '6px'
   },
+  wrapMessage: {
+    width: '100%',
+    margin: '20px',
+  },
   voteLockMessage: {
-    margin: '20px'
+    margin: '20px',
   },
   startDateMessage: {
     margin: '20px',
@@ -394,6 +398,11 @@ class Stake extends Component {
     return (
       <div className={ classes.actions }>
         <Typography variant={ 'h3'} className={ classes.title } noWrap>{ pool.name }</Typography>
+        {
+          (pool.id === 'govrewards') && <Typography variant={'h4'} className={classes.wrapMessage}>
+            You must <a href='javascript:{}' onClick={() => this.props.history.push('/wrap') && false}>wrap YFL tokens</a> before staking here
+          </Typography>
+        }
         <div className={ classes.actionContainer}>
           <Button
             fullWidth
@@ -545,9 +554,6 @@ class Stake extends Component {
     // Using toString() here seems to magically render trailing zeros past the point of significance,
     // while toFixed() renders the nearest number.
     const amount = bigInt((parseFloat(amountString) * 10**asset.decimals).toString())
-    // if(amount > selectedToken.balance) {
-    //   return false
-    // }
 
     this.setState({ loading: true })
     dispatcher.dispatch({ type: STAKE, content: { asset: asset, amount: amount } })
@@ -568,10 +574,6 @@ class Stake extends Component {
     const asset = pool.tokens[0]
     const amountString = this.state[asset.id + '_unstake']
     const amount = bigInt((parseFloat(amountString) * 10**asset.decimals).toString())
-    //
-    // if(amount > selectedToken.balance) {
-    //   return false
-    // }
 
     this.setState({ loading: true })
     dispatcher.dispatch({ type: WITHDRAW, content: { asset: asset, amount: amount } })

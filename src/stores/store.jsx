@@ -23,6 +23,8 @@ import {
   GET_REWARDS_RETURNED,
   GET_GOV_REQUIREMENTS,
   GET_GOV_REQUIREMENTS_RETURNED,
+  GET_WRAPPED,
+  GET_WRAPPED_RETURNED,
   PROPOSE,
   PROPOSE_RETURNED,
   STAKE,
@@ -32,7 +34,11 @@ import {
   VOTE_FOR,
   VOTE_FOR_RETURNED,
   WITHDRAW,
-  WITHDRAW_RETURNED
+  WITHDRAW_RETURNED,
+  WRAP,
+  WRAP_RETURNED,
+  UNWRAP,
+  UNWRAP_RETURNED,
 } from '../constants';
 import Web3 from 'web3';
 
@@ -95,6 +101,26 @@ class Store {
           code: 'zh'
         }
       ],
+      wrapping: {
+        raw: {
+          id: 'yfl',
+          symbol: 'YFL',
+          name: 'YFLink',
+          decimals: 18,
+          address: config.yflAddress,
+          abi: config.yflABI,
+          balance: bigInt(),
+        },
+        wrapper: {
+          id: 'wyfl',
+          symbol: 'wYFL',
+          name: 'Wrapped YFLink',
+          decimals: 18,
+          address: config.yflinkWrapperAddress,
+          abi: config.yflinkWrapperABI,
+          balance: bigInt(),
+        },
+      },
       proposals: [
       ],
       // claimableAsset: {
@@ -141,7 +167,7 @@ class Store {
           id: 'gov',
           title: 'Gov',
           name: 'Governance',
-          website: 'YFLINK Token',
+          website: 'YFLink Token',
           link: 'https://yflink.io',
           instructionsLink: 'https://gov.yflink.io/t/staking-in-the-governance-contract/28',
           depositsEnabled: true,
@@ -165,7 +191,7 @@ class Store {
           id: 'govrewards',
           title: 'Gov Rewards',
           name: 'Governance + Rewards',
-          website: 'YFLINK Token',
+          website: 'YFLink Token',
           link: 'https://yflink.io',
           instructionsLink: 'https://gov.yflink.io/t/mining-yfl-in-the-governance-rewards-contract/29',
           yieldCalculator: 'https://yieldfarming.yflink.io/yflink/govrewards',
@@ -173,10 +199,10 @@ class Store {
           startDate: config.governanceRewardsStartDate,
           tokens: [
             {
-              id: 'yfl',
-              address: config.yflAddress,
-              symbol: 'YFL',
-              abi: config.yflABI,
+              id: 'wyfl',
+              address: config.yflinkWrapperAddress,
+              symbol: 'wYFL',
+              abi: config.yflinkWrapperABI,
               rewardsAddress: config.governanceRewardsAddress,
               rewardsABI: config.governanceRewardsABI,
               rewardsSymbol: 'YFL',
@@ -314,6 +340,15 @@ class Store {
           case GET_GOV_REQUIREMENTS:
             this.getGovRequirements(payload)
             break;
+          case GET_WRAPPED:
+            this.getWrapped(payload)
+            break;
+          case WRAP:
+            this.doWrap(payload)
+            break;
+          case UNWRAP:
+            this.doUnwrap(payload)
+            break;
           default: {
           }
         }
@@ -431,6 +466,9 @@ class Store {
   }
 
   _checkApproval = async (asset, account, amount, contract, callback) => {
+    if (!asset.abi.allowance) {
+      return callback() // Doesn't need approval
+    }
     try {
       const web3 = new Web3(store.getStore('web3context').library.provider);
       const erc20Contract = new web3.eth.Contract(asset.abi, asset.address)
@@ -448,29 +486,6 @@ class Store {
         return callback(error.message)
       }
       callback(error)
-    }
-  }
-
-  _checkApprovalWaitForConfirmation = async (asset, account, amount, contract, callback) => {
-    const web3 = new Web3(store.getStore('web3context').library.provider);
-    let erc20Contract = new web3.eth.Contract(config.erc20ABI, asset.address)
-    const allowance = await erc20Contract.methods.allowance(account.address, contract).call({ from: account.address })
-
-    if(bigInt(allowance).lesser(amount)) {
-      erc20Contract.methods.approve(contract, web3.utils.toWei("999999999999999999", "ether")).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
-        .on('transactionHash', function(_hash){
-          callback()
-        })
-        .on('error', function(error) {
-          if (!error.toString().includes("-32601")) {
-            if(error.message) {
-              return callback(error.message)
-            }
-            callback(error)
-          }
-        })
-    } else {
-      callback()
     }
   }
 
@@ -505,48 +520,6 @@ class Store {
       callback(null, bigInt(earned))
     } catch(ex) {
       return callback(ex)
-    }
-  }
-
-  _checkIfApprovalIsNeeded = async (asset, account, amount, contract, callback, overwriteAddress) => {
-    const web3 = new Web3(store.getStore('web3context').library.provider);
-    let erc20Contract = new web3.eth.Contract(config.erc20ABI, (overwriteAddress ? overwriteAddress : asset.address))
-    const allowance = await erc20Contract.methods.allowance(account.address, contract).call({ from: account.address })
-
-    if(bigInt(allowance).lesser(amount)) {
-      asset.amount = amount
-      callback(null, asset)
-    } else {
-      callback(null, false)
-    }
-  }
-
-  _callApproval = async (asset, account, amount, contract, last, callback, overwriteAddress) => {
-    const web3 = new Web3(store.getStore('web3context').library.provider);
-    let erc20Contract = new web3.eth.Contract(config.erc20ABI, (overwriteAddress ? overwriteAddress : asset.address))
-    try {
-      if(last) {
-        await erc20Contract.methods.approve(contract, web3.utils.toWei("999999999999999999", "ether")).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
-        callback()
-      } else {
-        erc20Contract.methods.approve(contract, web3.utils.toWei("999999999999999999", "ether")).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
-          .on('transactionHash', function(_hash){
-            callback()
-          })
-          .on('error', function(error) {
-            if (!error.toString().includes("-32601")) {
-              if(error.message) {
-                return callback(error.message)
-              }
-              callback(error)
-            }
-          })
-      }
-    } catch(error) {
-      if(error.message) {
-        return callback(error.message)
-      }
-      callback(error)
     }
   }
 
@@ -1068,6 +1041,128 @@ class Store {
 
       store.setStore({claimableAsset: asset})
       emitter.emit(GET_CLAIMABLE_RETURNED)
+    })
+  }
+
+  getWrapped = () => {
+    const account = store.getStore('account')
+    const wrapping = store.getStore('wrapping')
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    async.parallel([
+      (cb) => { this._getERC20Balance(web3, wrapping.raw, account, cb) },
+      (cb) => { this._getERC20Balance(web3, wrapping.wrapper, account, cb) },
+    ], (err, data) => {
+      if(err) {
+        console.log(err)
+        return emitter.emit(ERROR, err)
+      }
+      wrapping.raw.balance = data[0]
+      wrapping.wrapper.balance = data[1]
+      store.setStore({wrapping: wrapping})
+      emitter.emit(GET_WRAPPED_RETURNED, wrapping)
+    })
+  }
+
+  doWrap = (payload) => {
+    const account = store.getStore('account')
+    const wrapping = store.getStore('wrapping')
+    const { amount } = payload.content
+
+    this._checkApproval(wrapping.raw, account, amount, wrapping.wrapper.address, (err) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+
+      this._callWrap(wrapping.wrapper, account, amount, (err, res) => {
+        if(err) {
+          return emitter.emit(ERROR, err);
+        }
+
+        return emitter.emit(WRAP_RETURNED, res)
+      })
+    })
+  }
+
+  _callWrap = async (wrapper, account, amount, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+    const wrapperContract = new web3.eth.Contract(wrapper.abi, wrapper.address)
+
+    wrapperContract.methods.wrap(amount.toString()).send({
+      from: account.address,
+      gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei')
+    }).on('transactionHash', function (hash) {
+      console.log(hash)
+      callback(null, hash)
+    }).on('confirmation', function (confirmationNumber, receipt) {
+      console.log(confirmationNumber, receipt);
+      if (confirmationNumber === 2) {
+        dispatcher.dispatch({type: GET_WRAPPED, content: {}})
+      }
+    }).on('receipt', function (receipt) {
+      console.log(receipt);
+    }).on('error', function (error) {
+      if (!error.toString().includes("-32601")) {
+        if (error.message) {
+          return callback(error.message)
+        }
+        callback(error)
+      }
+    }).catch((error) => {
+      if (!error.toString().includes("-32601")) {
+        if (error.message) {
+          return callback(error.message)
+        }
+        callback(error)
+      }
+    })
+  }
+
+  doUnwrap = (payload) => {
+    const account = store.getStore('account')
+    const wrapping = store.getStore('wrapping')
+    const { amount } = payload.content
+
+    this._callUnwrap(wrapping.wrapper, account, amount, (err, res) => {
+      if (err) {
+        return emitter.emit(ERROR, err);
+      }
+
+      return emitter.emit(UNWRAP_RETURNED, res)
+    })
+  }
+
+  _callUnwrap = async (wrapper, account, amount, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+    const wrapperContract = new web3.eth.Contract(wrapper.abi, wrapper.address)
+
+    wrapperContract.methods.unwrap(amount.toString()).send({
+      from: account.address,
+      gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei')
+    }).on('transactionHash', function (hash) {
+      console.log(hash)
+      callback(null, hash)
+    }).on('confirmation', function (confirmationNumber, receipt) {
+      console.log(confirmationNumber, receipt);
+      if (confirmationNumber === 2) {
+        dispatcher.dispatch({type: GET_WRAPPED, content: {}})
+      }
+    }).on('receipt', function (receipt) {
+      console.log(receipt);
+    }).on('error', function (error) {
+      if (!error.toString().includes("-32601")) {
+        if (error.message) {
+          return callback(error.message)
+        }
+        callback(error)
+      }
+    }).catch((error) => {
+      if (!error.toString().includes("-32601")) {
+        if (error.message) {
+          return callback(error.message)
+        }
+        callback(error)
+      }
     })
   }
 
