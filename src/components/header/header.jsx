@@ -14,7 +14,7 @@ const styles = theme => ({
     width: '100%',
     display: 'flex',
   },
-  earn: {
+  stake: {
     flex: '1',
     height: '75px',
     width: '100%',
@@ -49,7 +49,7 @@ const styles = theme => ({
       color: colors.white
     },
   },
-  zap: {
+  vote: {
     flex: '1',
     height: '75px',
     width: '100%',
@@ -84,77 +84,7 @@ const styles = theme => ({
       color: colors.white
     },
   },
-  apr: {
-    flex: '1',
-    height: '75px',
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    cursor: 'pointer',
-    backgroundColor: colors.lightBlack,
-    '&:hover': {
-      backgroundColor: "#f9fafb",
-      '& .title': {
-        color: colors.lightBlack
-      },
-      '& .titleActive': {
-        color: colors.lightBlack,
-        borderBottom: '4px solid '+colors.lightBlack,
-        padding: '10px 0px'
-      },
-      '& .icon': {
-        color: colors.lightBlack
-      }
-    },
-    '& .title': {
-      color: colors.white
-    },
-    '& .titleActive': {
-      color: colors.white,
-      borderBottom: '4px solid white',
-      padding: '10px 0px'
-    },
-    '& .icon': {
-      color: colors.white
-    }
-  },
-  cover: {
-    flex: '1',
-    height: '75px',
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    cursor: 'pointer',
-    backgroundColor: colors.compoundGreen,
-    '&:hover': {
-      backgroundColor: "#f9fafb",
-      '& .title': {
-        color: colors.compoundGreen
-      },
-      '& .titleActive': {
-        color: colors.compoundGreen,
-        borderBottom: '4px solid '+colors.compoundGreen,
-        padding: '10px 0px'
-      },
-      '& .icon': {
-        color: colors.compoundGreen
-      }
-    },
-    '& .title': {
-      color: colors.white
-    },
-    '& .titleActive': {
-      color: colors.white,
-      borderBottom: '4px solid white',
-      padding: '10px 0px'
-    },
-    '& .icon': {
-      color: colors.white
-    }
-  },
-  pool: {
+  lock: {
     flex: '1',
     height: '75px',
     width: '100%',
@@ -210,34 +140,19 @@ function Header(props) {
     props.history.push('/'+screen)
   }
 
-  return(<div></div>)
-
   return (
     <div className={ classes.root }>
-      <div className={ `${classes.earn}` } onClick={ () => { nav('earn') } }>
-        <Typography variant={'h3'} className={ headerValue===0?`titleActive`:`title` }>Earn</Typography>
+      <div className={ `${classes.stake}` } onClick={ () => { nav('staking') } }>
+        <Typography variant={'h3'} className={ headerValue===0?`titleActive`:`title` }>Stake</Typography>
       </div>
-      <div className={ `${classes.zap}` } onClick={ () => { nav('zap') } }>
-        <Typography variant={'h3'} className={ headerValue===1?`titleActive`:`title` }>Zap</Typography>
+      <div className={ `${classes.vote}` } onClick={ () => { nav('vote') } }>
+        <Typography variant={'h3'} className={ headerValue===1?`titleActive`:`title` }>Vote</Typography>
       </div>
-      <div className={ `${classes.apr}` } onClick={ () => { nav('apr') } }>
-        <Typography variant={'h3'} className={ headerValue===2?`titleActive`:`title` }>APR</Typography>
-      </div>
-      <div className={ `${classes.cover}` } onClick={ () => { nav('cover') } }>
-        <Typography variant={'h3'} className={ headerValue===3?`titleActive`:`title` }>Cover</Typography>
-      </div>
-      <div className={ `${classes.pool}` } onClick={ () => { nav('pool') } }>
-        <Typography variant={'h3'} className={ headerValue===4?`titleActive`:`title` }>Pool</Typography>
-      </div>
+      {/*<div className={ `${classes.lock}` } onClick={ () => { nav('lock') } }>
+        <Typography variant={'h3'} className={ headerValue===2?`titleActive`:`title` }>Lock</Typography>
+      </div>*/}
     </div>
   )
-}
-
-function a11yProps(index) {
-  return {
-    id: `full-width-tab-${index}`,
-    'aria-controls': `full-width-tabpanel-${index}`,
-  };
 }
 
 export default withRouter(withStyles(styles)(Header));

@@ -20,6 +20,7 @@ import Propose from './components/propose';
 import Claim from './components/claim';
 import Vote from './components/vote';
 import VersionToggle from './components/versionToggle';
+import Lock from './components/lock';
 
 import {
   CONNECTION_CONNECTED,
@@ -80,7 +81,7 @@ class App extends Component {
   getBalancesReturned = () => {
     window.setTimeout(() => {
       dispatcher.dispatch({ type: GET_BALANCES_PERPETUAL, content: {} })
-    }, 15000)
+    }, 300000)
   }
 
   configureReturned = () => {
@@ -128,23 +129,27 @@ class App extends Component {
             }}>
               <Switch>
                 <Route path="/stake">
-                  <Footer />
+                  <Header />
                   <Stake />
                 </Route>
                 <Route path="/staking">
+                <Header />
                   <VersionToggle />
-                  <Footer />
                   <RewardsPools />
                 </Route>
                 <Route path="/vote">
+                  <Header />
                   <VersionToggle />
-                  <Footer />
                   <Vote />
                 </Route>
                 <Route path="/propose">
+                <Header />
                   <VersionToggle />
-                  <Footer />
                   <Propose />
+                </Route>
+                <Route path="/lock">
+                  <Header />
+                  <Lock />
                 </Route>
                 <Route path="/">
                   <Home />
