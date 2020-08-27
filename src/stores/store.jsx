@@ -138,32 +138,6 @@ class Store {
       // },
       rewardPools: [
         {
-          id: 'pool3',
-          title: 'Pool 3',
-          name: 'aLINK/YFL Balancer',
-          website: 'Balancer Pool',
-          link: 'https://pools.balancer.exchange/#/pool/' + config.pool3StakeAddress,
-          instructionsLink: 'https://gov.yflink.io/t/mining-yfl-in-pool-3-alink-yfl-balancer/27',
-          yieldCalculator: "https://yieldfarming.yflink.io/yflink/pool3",
-          depositsEnabled: true,
-          startDate: config.pool3StartDate,
-          tokens: [
-            {
-              id: 'bpt',
-              address: config.pool3StakeAddress,
-              symbol: 'BPT',
-              abi: config.erc20ABI,
-              rewardsAddress: config.pool3Address,
-              rewardsABI: config.pool3ABI,
-              rewardsSymbol: 'YFL',
-              decimals: 18,
-              balance: bigInt(),
-              stakedBalance: bigInt(),
-              rewardsAvailable: bigInt()
-            }
-          ]
-        },
-        {
           id: 'gov',
           title: 'Gov',
           name: 'Governance',
@@ -187,32 +161,33 @@ class Store {
             }
           ]
         },
-        {
-          id: 'govrewards',
-          title: 'Gov Rewards',
-          name: 'Governance + Rewards',
-          website: 'YFLink Token',
-          link: 'https://yflink.io',
-          instructionsLink: 'https://gov.yflink.io/t/mining-yfl-in-the-governance-rewards-contract/29',
-          yieldCalculator: 'https://yieldfarming.yflink.io/yflink/govrewards',
-          depositsEnabled: true,
-          startDate: config.governanceRewardsStartDate,
-          tokens: [
-            {
-              id: 'wyfl',
-              address: config.yflinkWrapperAddress,
-              symbol: 'wYFL',
-              abi: config.yflinkWrapperABI,
-              rewardsAddress: config.governanceRewardsAddress,
-              rewardsABI: config.governanceRewardsABI,
-              rewardsSymbol: 'YFL',
-              decimals: 18,
-              balance: bigInt(),
-              stakedBalance: bigInt(),
-              rewardsAvailable: bigInt()
-            }
-          ]
-        },
+        // The Gov Rewards pool contract is broken, staking is impossible.
+        // {
+        //   id: 'govrewards',
+        //   title: 'Gov Rewards',
+        //   name: 'Governance + Rewards',
+        //   website: 'YFLink Token',
+        //   link: 'https://yflink.io',
+        //   instructionsLink: 'https://gov.yflink.io/t/mining-yfl-in-the-governance-rewards-contract/29',
+        //   yieldCalculator: 'https://yieldfarming.yflink.io/yflink/govrewards',
+        //   depositsEnabled: true,
+        //   startDate: config.governanceRewardsStartDate,
+        //   tokens: [
+        //     {
+        //       id: 'wyfl',
+        //       address: config.yflinkWrapperAddress,
+        //       symbol: 'wYFL',
+        //       abi: config.yflinkWrapperABI,
+        //       rewardsAddress: config.governanceRewardsAddress,
+        //       rewardsABI: config.governanceRewardsABI,
+        //       rewardsSymbol: 'YFL',
+        //       decimals: 18,
+        //       balance: bigInt(),
+        //       stakedBalance: bigInt(),
+        //       rewardsAvailable: bigInt()
+        //     }
+        //   ]
+        // },
         {
           id: 'pool0',
           title: 'Pool 0',
@@ -281,6 +256,32 @@ class Store {
               abi: config.erc20ABI,
               rewardsAddress: config.pool2Address,
               rewardsABI: config.pool2ABI,
+              rewardsSymbol: 'YFL',
+              decimals: 18,
+              balance: bigInt(),
+              stakedBalance: bigInt(),
+              rewardsAvailable: bigInt()
+            }
+          ]
+        },
+        {
+          id: 'pool3',
+          title: 'Pool 3',
+          name: 'aLINK/YFL Balancer (exhausted)',
+          website: 'Balancer Pool',
+          link: 'https://pools.balancer.exchange/#/pool/' + config.pool3StakeAddress,
+          instructionsLink: 'https://gov.yflink.io/t/mining-yfl-in-pool-3-alink-yfl-balancer/27',
+          yieldCalculator: "https://yieldfarming.yflink.io/yflink/pool3",
+          depositsEnabled: false,
+          startDate: config.pool3StartDate,
+          tokens: [
+            {
+              id: 'bpt',
+              address: config.pool3StakeAddress,
+              symbol: 'BPT',
+              abi: config.erc20ABI,
+              rewardsAddress: config.pool3Address,
+              rewardsABI: config.pool3ABI,
               rewardsSymbol: 'YFL',
               decimals: 18,
               balance: bigInt(),
@@ -546,6 +547,7 @@ class Store {
     const web3 = new Web3(store.getStore('web3context').library.provider);
     const rewardsContract = new web3.eth.Contract(asset.rewardsABI, asset.rewardsAddress)
 
+    console.debug(amount.toString())
     rewardsContract.methods.stake(amount.toString()).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
       .on('transactionHash', function(hash){
         console.log(hash)
