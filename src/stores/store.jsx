@@ -56,6 +56,8 @@ import {
   authereum
 } from "./connectors";
 
+import getMyVotes from '../utils/voteFinder.js';
+
 const rp = require('request-promise');
 const ethers = require('ethers');
 
@@ -878,6 +880,34 @@ class Store {
       const governanceContract = new web3.eth.Contract(abi, address)
       var proposal = await governanceContract.methods.proposals(number).call({ from: account.address });
 
+      /*
+        Get the current votes from the govContract of the current wallet and set some fields on the proposal which can be used easily in the frontend.
+
+        The govContract allows to re-vote at any time while the proposal is still open, so it's okay to first vote FOR and at a later time
+        to vote AGAINST as all votes are shifted either into the FOR or the AGAINST bucket which is taken care of by the contract.
+        When people increase or decrease the amount of YFI they're staking into ygov, they can re-vote with more or less votes as long as the
+        proposal is still pending.
+      */
+      const {
+        myVotes,
+        direction
+      } = await getMyVotes(web3, address, account.address, proposal.id);
+      const totalVotes = Number(proposal.totalForVotes) + Number(proposal.totalAgainstVotes);
+      const myVotesRatio = Number(totalVotes) === 0 ? 0 : myVotes / totalVotes;
+
+      // myTotalVotes represents the currently staked votes for a wallet
+      const myTotalVotes = await governanceContract.methods.votesOf(account.address).call({ from: account.address });
+
+      // calculate the available votes that could be used for voting
+      const availableVotes = Math.max(myTotalVotes - myVotes, 0);
+      const currentBlock = await web3.eth.getBlockNumber();
+      const isPendingVote = Number(proposal.start) <= currentBlock && currentBlock <= Number(proposal.end);
+
+      proposal.myVotes = myVotes;
+      proposal.direction = direction;
+      proposal.myVotesRatio = myVotesRatio;
+      proposal.availableVotes = availableVotes;
+      proposal.canStillVote = isPendingVote && availableVotes > 0;
       proposal.executor = governanceContractVersion === 1 ? '0x0000000000000000000000000000000000000000' : proposal.executor
       proposal.hash = governanceContractVersion === 1 ? 'na' : proposal.hash
       proposal.quorum = governanceContractVersion === 1 ? 'na' : proposal.quorum
