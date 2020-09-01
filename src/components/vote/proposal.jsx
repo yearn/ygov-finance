@@ -325,14 +325,14 @@ class Proposal extends Component {
           <div className={classes.headingName}>
             <div className={ classes.YIPheading }>
               { proposal.myVotes > 0 && proposal.direction === "FOR" &&
-                <CheckCircleIcon style={{ fontSize: 30, color: green[500] }}/>
+                <CheckCircleIcon style={{ fontSize: 20, color: green[500] }}/>
               }
               { proposal.myVotes > 0 && proposal.direction === "AGAINST" &&
-                <CancelIcon style={{ fontSize: 30, color: red[500] }} />
+                <CancelIcon style={{ fontSize: 20, color: red[500] }} />
               }
               {
                 proposal.myVotes === 0 &&
-                <WarningIcon style={{ fontSize: 30, color: orange[500] }}/>
+                <WarningIcon style={{ fontSize: 20, color: orange[500] }}/>
               }
             </div>
             <div>
