@@ -37,7 +37,12 @@ export const colors = {
   lightBlue: "#2F80ED",
   topaz: "#0b8f92",
   darkGray: "rgba(43,57,84,.5)",
-  borderBlue: 'rgba(25, 101, 233, 0.5)'
+  borderBlue: 'rgba(25, 101, 233, 0.5)',
+  greyBackground: '#2B3A4A',
+  greyText: '#BDCBDA',
+  yellowBackground: 'rgba(238, 203, 112, 0.3)',
+  yellowText: '#EECB70',
+  blueGreyText: '#BDCBDA',
 };
 
 const breakpoints = createBreakpoints({
@@ -64,6 +69,7 @@ const iswapTheme =  {
       '"Apple Color Emoji"',
       '"Segoe UI Emoji"',
       '"Segoe UI Symbol"',
+      '"Formular"',
     ].join(','),
     h1: {
       fontSize: '48px',
@@ -112,6 +118,14 @@ const iswapTheme =  {
       WebkitFontSmoothing: "antialiased",
       MozOsxFontSmoothing: "grayscale",
     },
+    body3: {
+      fontFamily: 'Formular',
+      fontStyle: 'normal',
+      fontWeight: 'normal',
+      fontSize: '24px',
+      lineHeight: '29px',
+      letterSpacing: '0.3em'
+    }
   },
   type: 'light',
   overrides: {

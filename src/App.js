@@ -18,6 +18,7 @@ import Wrap from './components/wrap';
 import RewardsPools from './components/rewardPools';
 import Propose from './components/propose';
 import Vote from './components/vote';
+import Initial from './components/initial/initial';
 
 import {
   CONNECTION_CONNECTED,
@@ -141,8 +142,11 @@ class App extends Component {
                   <Footer />
                   <Propose />
                 </Route>
-                <Route path="/">
+                <Route path="/home">
                   <Home />
+                </Route>              
+                <Route path="/">
+                  <Initial />
                 </Route>
               </Switch>
             </div>
