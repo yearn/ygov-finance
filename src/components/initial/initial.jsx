@@ -307,6 +307,7 @@ class Initial extends Component {
                 githubUrl="https://github.com/yflink"
                 mediumUrl="https://medium.com/yflink"
                 telegramUrl="https://t.me/YFLinkGroup"
+                discordUrl="https://discord.gg/2dMUdG"
               />
             </div>
           </div>

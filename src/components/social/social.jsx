@@ -27,7 +27,7 @@ const styles = theme => ({
 class Social extends Component {
 
   render() {
-    const { classes, twitterUrl, githubUrl, mediumUrl, telegramUrl } = this.props;
+    const { classes, twitterUrl, githubUrl, mediumUrl, telegramUrl, discordUrl } = this.props;
 
     return (
       <div className={classes.root}>
@@ -49,6 +49,11 @@ class Social extends Component {
         {telegramUrl && (
           <div className={classes.mediaContainer} onClick={() => {this.nav(telegramUrl)}}>
             <img alt="medium" src={require("../../assets/yfl-telegram-logo.svg")} width="30px" height="30px" />
+          </div>
+        )}
+        {discordUrl && (
+          <div className={classes.mediaContainer} onClick={() => {this.nav(discordUrl)}}>
+            <img alt="medium" src={require("../../assets/yfl-discord-logo.svg")} width="30px" height="34px" />
           </div>
         )}
       </div>
