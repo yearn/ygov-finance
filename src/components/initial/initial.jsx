@@ -207,7 +207,7 @@ class Initial extends Component {
     }
   }
 
-  onSubmit = (email) => {
+  onSubmit = async (email) => {
     if (!email) {
       this.setState({ inputEmail: '', error: 'Please input email address!' })
       return
@@ -218,6 +218,30 @@ class Initial extends Component {
       return
     }
     console.log('onSubmit success', email)
+    const requestUrl = "https://app.sender.net/api/"
+    const data = {
+      method : 'listSubscribe',
+      params : {
+        "api_key": "b0532c1710226cb9430f43cdd6c66326",
+        "list_id": "191764",
+        emails: [email]
+      }
+    }
+    const payload = new FormData()
+    payload.append('data', JSON.stringify(data))
+    const response = await fetch(requestUrl, {
+      method: 'post',
+      mode: 'no-cors',
+      body: payload
+    })
+    try {
+      const respBody = await response.json()
+      console.log('Email Response', respBody)
+      return respBody
+    } catch (error) {
+      console.error('Error: ', error)
+      this.setState({error: `${error}`})
+    }
   }
 
   renderHeader = () => {
@@ -317,7 +341,7 @@ class Initial extends Component {
   }
 
   render() {
-    const { classes, location } = this.props;
+    const { classes } = this.props;
 
     return (
       <div className={classes.root}>
