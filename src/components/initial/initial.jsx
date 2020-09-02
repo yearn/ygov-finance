@@ -303,9 +303,10 @@ class Initial extends Component {
             </div>
             <div className={classes.socialMediaContainer}>
               <SocialShare
-                twitterUrl="https://twitter.com/"
-                githubUrl="https://github.com/"
-                mediumUrl="https://medium.com/"
+                twitterUrl="https://twitter.com/YFLinkio"
+                githubUrl="https://github.com/yflink"
+                mediumUrl="https://medium.com/yflink"
+                telegramUrl="https://t.me/YFLinkGroup"
               />
             </div>
           </div>

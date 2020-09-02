@@ -17,6 +17,7 @@ const styles = theme => ({
     width: '30px',
     height: '30px',
     cursor: 'pointer',
+    borderRadius: '3px',
     '&:hover': {
       opacity: '0.7',
     }
@@ -26,7 +27,7 @@ const styles = theme => ({
 class Social extends Component {
 
   render() {
-    const { classes, twitterUrl, githubUrl, mediumUrl, linkedInUrl } = this.props;
+    const { classes, twitterUrl, githubUrl, mediumUrl, telegramUrl } = this.props;
 
     return (
       <div className={classes.root}>
@@ -44,7 +45,12 @@ class Social extends Component {
           <div className={classes.mediaContainer} onClick={() => {this.nav(mediumUrl)}}>
             <img alt="medium" src={require("../../assets/yfl-medium-logo.svg")} width="30px" height="30px" />
           </div>
-        )}        
+        )}
+        {telegramUrl && (
+          <div className={classes.mediaContainer} onClick={() => {this.nav(telegramUrl)}}>
+            <img alt="medium" src={require("../../assets/yfl-telegram-logo.svg")} width="30px" height="30px" />
+          </div>
+        )}
       </div>
     )
   };
