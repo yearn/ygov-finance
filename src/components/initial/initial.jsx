@@ -1,13 +1,16 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import { withStyles } from '@material-ui/core/styles';
-import { Typography, InputBase, IconButton } from '@material-ui/core';
+import { Typography, InputBase, IconButton, CircularProgress } from '@material-ui/core';
 import ArrowRightAltOutlinedIcon from '@material-ui/icons/ArrowRightAltOutlined';
 import { withNamespaces } from 'react-i18next';
 import { colors } from '../../theme'
 import HeaderLogo from '../header/logo/logo'
 import HeaderLink from '../header/link/link'
 import SocialShare from "../social/social";
+import Store from "../../stores";
+import MailchimpSubscribe from "react-mailchimp-subscribe"
+
 
 const styles = theme => ({
   root: {
@@ -183,9 +186,25 @@ const styles = theme => ({
     display: 'flex',
     alignItems: 'center',
     letterSpacing: '0.06em',
+    '& a': {
+      color: colors.white,
+    }
+  },
+  emailSuccessText: {
+    color: colors.green,
+    fontStyle: 'normal',
+    fontWeight: 'normal',
+    fontSize: '12px',
+    lineHeight: '13px',
+    display: 'flex',
+    alignItems: 'center',
+    letterSpacing: '0.06em',
   },
   socialMediaContainer: {
     marginLeft: '6px',
+  },
+  loadingIcon: {
+    color: colors.white,
   }
 });
 
@@ -196,6 +215,63 @@ const ValidateEmail = (mail) => {
   }
   return "Invalid Address!"
 }
+
+const store = Store.store
+const mailchimpUrl = "https://yflink.us17.list-manage.com/subscribe/post?u=f170cca247406899e9a7fbe82&amp;id=feee202dc5";
+
+const CustomForm = ({ status, message, onValidated }) => {
+  let email, name;
+  const submit = () =>
+    email &&
+    name &&
+    email.value.indexOf("@") > -1 &&
+    onValidated({
+      EMAIL: email.value,
+      NAME: name.value
+    });
+
+  return (
+    <div
+      style={{
+        background: "#efefef",
+        borderRadius: 2,
+        padding: 10,
+        display: "inline-block"
+      }}
+    >
+      {status === "sending" && <div style={{ color: "blue" }}>sending...</div>}
+      {status === "error" && (
+        <div
+          style={{ color: "red" }}
+          dangerouslySetInnerHTML={{ __html: message }}
+        />
+      )}
+      {status === "success" && (
+        <div
+          style={{ color: "green" }}
+          dangerouslySetInnerHTML={{ __html: message }}
+        />
+      )}
+      <input
+        style={{ fontSize: "2em", padding: 5 }}
+        ref={node => (name = node)}
+        type="text"
+        placeholder="Your name"
+      />
+      <br />
+      <input
+        style={{ fontSize: "2em", padding: 5 }}
+        ref={node => (email = node)}
+        type="email"
+        placeholder="Your email"
+      />
+      <br />
+      <button style={{ fontSize: "2em", padding: 5 }} onClick={submit}>
+        Submit
+      </button>
+    </div>
+  );
+};
 
 class Initial extends Component {
 
@@ -218,43 +294,20 @@ class Initial extends Component {
       return
     }
     console.log('onSubmit success', email)
-    const requestUrl = "https://app.sender.net/api/"
-    const data = {
-      method : 'listSubscribe',
-      params : {
-        "api_key": "b0532c1710226cb9430f43cdd6c66326",
-        "list_id": "191764",
-        emails: [email]
-      }
-    }
-    const payload = new FormData()
-    payload.append('data', JSON.stringify(data))
-    const response = await fetch(requestUrl, {
-      method: 'post',
-      mode: 'no-cors',
-      body: payload
-    })
-    try {
-      const respBody = await response.json()
-      console.log('Email Response', respBody)
-      return respBody
-    } catch (error) {
-      console.error('Error: ', error)
-      this.setState({error: `${error}`})
-    }
+
   }
 
   renderHeader = () => {
     const { classes } = this.props
-
+    const account = store.getStore('account')
     return (
       <div className={ classes.headerContainer }>
         <div className={ classes.logoContainer }>
           <HeaderLogo />
         </div>
         <div className={classes.linkContainer}>
-          <HeaderLink text='STAKE' to='/staking' />
-          <HeaderLink text='VOTE' to='/vote' />
+          <HeaderLink text='STAKE' to={account && account.address ? '/staking' : '/account'} redirectedTo={'/staking'} />
+          <HeaderLink text='VOTE' to={account && account.address ? '/vote' : '/account'} redirectedTo={'/vote'} />
           <HeaderLink text='LINKSWAP' to='/' disabled tag='SOON' />
           <HeaderLink text='PRODUCTS' to='/' disabled tag='SOON' />
         </div>
@@ -282,49 +335,80 @@ class Initial extends Component {
             <div className={classes.linkSwapIconContainer}>
               <img alt="linkswap" src={require("../../assets/YFLink-linkswap-logo.svg")} height="80px" />
             </div>
-            <div className={error ? classes.emailInputError : classes.emailInputContainer}>
-              <InputBase
-                classes={{
-                  root: classes.customInputBoxRoot,
-                }}
-                onChange={(ev) => {
-                  if (error) {
-                    this.setState({
-                      inputEmail: ev.target.value,
-                      error: ValidateEmail(ev.target.value)
-                    })
-                  } else {
-                    this.setState({
-                      inputEmail: ev.target.value,
-                    })
-                  }
-                }}
-                onKeyPress={(ev) => {
-                  if (ev.key === 'Enter') {
-                    this.onSubmit(inputEmail)
-                  }
-                }}
-                placeholder='Enter email for updates'
-                autoFocus
+              <MailchimpSubscribe
+                url={mailchimpUrl}
+                render={({ subscribe, status, message }) => (
+                  <>
+                    <div className={error ? classes.emailInputError : classes.emailInputContainer}>
+                      <InputBase
+                        classes={{
+                          root: classes.customInputBoxRoot,
+                        }}
+                        onChange={(ev) => {
+                          if (error) {
+                            this.setState({
+                              inputEmail: ev.target.value,
+                              error: ValidateEmail(ev.target.value)
+                            })
+                          } else {
+                            this.setState({
+                              inputEmail: ev.target.value,
+                            })
+                          }
+                        }}
+                        onKeyPress={(ev) => {
+                          if (ev.key === 'Enter') {
+                            subscribe({EMAIL: inputEmail})
+                          }
+                        }}
+                        placeholder='Enter email for updates'
+                        autoFocus
+                      />
+                      <IconButton
+                        onClick={(ev) => {
+                          subscribe({ EMAIL: inputEmail })
+                        }}
+                      >
+                        <ArrowRightAltOutlinedIcon style={{color: colors.white}}/>
+                      </IconButton>
+                    </div>
+                  <div className={classes.emailErrorContainer}>
+                      {status === "error" && (
+                          <Typography
+                            variant='h6'
+                            className={classes.emailErrorText}
+                          >
+                            <div
+                              dangerouslySetInnerHTML={{ __html: message }}
+                            />
+                          </Typography>                      
+                      )}
+                      {status === "sending" && (
+                          <CircularProgress color="secondary" size="20px"/>
+                      )}
+                      {status === "success" && (
+                          <Typography
+                            variant='h6'
+                            className={classes.emailSuccessText}
+                          >
+                            <div
+                              dangerouslySetInnerHTML={{ __html: message }}
+                            />
+                          </Typography>
+                      )}
+
+                      {!message && error && (
+                          <Typography
+                            variant='h6'
+                            className={classes.emailErrorText}
+                          >
+                            {error}
+                          </Typography>
+                      )}
+                    </div>
+                  </>
+                )}
               />
-              <IconButton
-                onClick={(ev) => {
-                  this.onSubmit(inputEmail)
-                }}
-              >
-                <ArrowRightAltOutlinedIcon style={{color: colors.white}}/>
-              </IconButton>
-            </div>
-            <div className={classes.emailErrorContainer}>
-              {error && (
-                  <Typography
-                    variant='h6'
-                    className={classes.emailErrorText}
-                  >
-                    {error}
-                  </Typography>
-              )}
-            </div>
             <div className={classes.socialMediaContainer}>
               <SocialShare
                 twitterUrl="https://twitter.com/YFLinkio"

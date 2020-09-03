@@ -4,6 +4,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { Typography } from '@material-ui/core';
 import { withNamespaces } from 'react-i18next';
 import { colors } from '../../../theme/theme'
+import Store from "../../../stores";
 
 const styles = theme => ({
   root: {
@@ -63,13 +64,21 @@ const styles = theme => ({
   }
 });
 
+const store = Store.store
+
 class Link extends Component {
 
   render() {
-    const { classes, text, to, disabled, tag } = this.props;
+    const { classes, text, to, disabled, tag, redirectedTo } = this.props;
 
     return (
-      <div className={classes.root} onClick={() => { this.nav(to) }}>
+      <div
+        className={classes.root}
+        onClick={() => {
+          store.setStore({redirect : redirectedTo})
+          this.nav(to)
+        }}
+      >
         {tag && (
           <div className={disabled ? classes.disabledTag: classes.activeTag}>
             <Typography

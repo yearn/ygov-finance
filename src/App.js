@@ -58,7 +58,6 @@ class App extends Component {
         .then((a) => {
           store.setStore({ account: { address: a.account }, web3context: { library: { provider: a.provider } } })
           emitter.emit(CONNECTION_CONNECTED)
-          // console.log(a)
         })
         .catch((_e) => {
           // console.log(e)
@@ -85,72 +84,61 @@ class App extends Component {
   }
 
   connectionConnected = () => {
+    console.log('connectionConnected')    
     this.setState({ account: store.getStore('account') })
     dispatcher.dispatch({ type: CONFIGURE, content: {} })
   };
 
   connectionDisconnected = () => {
+    console.log('connectionDisconnected')
     this.setState({ account: store.getStore('account') })
   }
 
   render() {
 
-    const { account } = this.state
-
     return (
       <MuiThemeProvider theme={ createMuiTheme(interestTheme) }>
         <CssBaseline />
         <HashRouter>
-          { !account &&
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              minHeight: '100vh',
-              minWidth: '100vw',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-              <Account />
-            </div>
-          }
-          { account &&
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              minHeight: '100vh',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-              <Switch>
-                <Route path="/stake">
-                  <Footer />
-                  <Stake />
-                </Route>
-                <Route path="/wrap">
-                  <Footer />
-                  <Wrap />
-                </Route>
-                <Route path="/staking">
-                  <Footer />
-                  <RewardsPools />
-                </Route>
-                <Route path="/vote">
-                  <Footer />
-                  <Vote />
-                </Route>
-                <Route path="/propose">
-                  <Footer />
-                  <Propose />
-                </Route>
-                <Route path="/home">
-                  <Home />
-                </Route>              
-                <Route path="/">
-                  <Initial />
-                </Route>
-              </Switch>
-            </div>
-          }
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: '100vh',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+            <Switch>
+              <Route path="/stake">
+                <Footer />
+                <Stake />
+              </Route>
+              <Route path="/wrap">
+                <Footer />
+                <Wrap />
+              </Route>
+              <Route path="/staking">
+                <Footer />
+                <RewardsPools />
+              </Route>
+              <Route path="/vote">
+                <Footer />
+                <Vote />
+              </Route>
+              <Route path="/propose">
+                <Footer />
+                <Propose />
+              </Route>
+              <Route path="/home">
+                <Home />
+              </Route>
+              <Route path="/account">
+                <Account />
+              </Route>
+              <Route path="/">
+                <Initial />
+              </Route>
+            </Switch>
+          </div>
         </HashRouter>
       </MuiThemeProvider>
     );

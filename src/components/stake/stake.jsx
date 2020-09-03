@@ -248,6 +248,10 @@ class Stake extends Component {
       props.history.push('/')
     }
 
+    if (!account || !account.address) {
+      props.history.push('/')
+    }
+
     this.state = {
       pool: pool,
       loading: !(account || pool),
@@ -258,7 +262,7 @@ class Stake extends Component {
       voteLock: null,
     }
 
-    if(pool && pool.id.startsWith('gov')) {
+    if(pool && pool.id.startsWith('gov') && account && account.address) {
       dispatcher.dispatch({ type: GET_GOV_REQUIREMENTS, content: {} })
     }
   }
