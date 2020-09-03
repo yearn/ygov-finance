@@ -243,6 +243,10 @@ class Vote extends Component {
     const account = store.getStore('account')
     const proposals = store.getStore('proposals')
 
+    if (!account || !account.address) {
+      props.history.push('/')
+    }
+
     this.state = {
       loading: false,
       account: account,
@@ -250,7 +254,9 @@ class Vote extends Component {
       value: 0,
     }
 
-    dispatcher.dispatch({ type: GET_PROPOSALS, content: {} })
+    if (account && account.address) {
+      dispatcher.dispatch({ type: GET_PROPOSALS, content: {} })
+    }
   }
 
   componentDidMount() {

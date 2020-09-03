@@ -17,6 +17,7 @@ import {
   GET_BALANCES,
   GET_BALANCES_RETURNED,
 } from '../../constants'
+import Loader from '../loader/loader.jsx';
 
 const styles = theme => ({
   root: {
@@ -173,13 +174,18 @@ class RewardPools extends Component {
     const account = store.getStore('account')
     const rewardPools = store.getStore('rewardPools')
 
+    if (!account || !account.address) {
+      props.history.push('/')
+    }
+
     this.state = {
       rewardPools: rewardPools,
       loading: !(account && rewardPools),
       account: account,
     }
-
-    dispatcher.dispatch({type: GET_BALANCES, content: {}})
+    if (account && account.address) {
+      dispatcher.dispatch({type: GET_BALANCES, content: {}})
+    }
   }
 
   componentDidMount() {
@@ -205,12 +211,21 @@ class RewardPools extends Component {
     const {classes} = this.props;
     const {
       account,
+      loading,
       modalOpen,
     } = this.state
 
     var address = null;
     if (account.address) {
       address = account.address.substring(0, 6) + '...' + account.address.substring(account.address.length - 4, account.address.length)
+    }
+
+    if (loading) {
+      return (
+        <div className={classes.root}>
+          <Loader />
+        </div>
+      )
     }
 
     return (

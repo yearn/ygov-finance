@@ -155,6 +155,10 @@ class Propose extends Component {
     super(props)
 
     const account = store.getStore('account')
+    
+    if (!account || !account.address) {
+      props.history.push('/')
+    }
 
     this.state = {
       loading: false,
