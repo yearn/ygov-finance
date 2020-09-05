@@ -5,12 +5,14 @@ import { Typography, InputBase, IconButton, CircularProgress } from '@material-u
 import ArrowRightAltOutlinedIcon from '@material-ui/icons/ArrowRightAltOutlined';
 import { withNamespaces } from 'react-i18next';
 import { colors } from '../../theme'
+
 import HeaderLogo from '../header/logo/logo'
 import HeaderLink from '../header/link/link'
 import SocialShare from "../social/social";
 import Store from "../../stores";
 import MailchimpSubscribe from "react-mailchimp-subscribe"
-
+import {ReactComponent as OptionsIcon} from '../../assets/YFLink-header-options.svg'
+import RedirectModal from '../header/modal/modal';
 
 const styles = theme => ({
   root: {
@@ -38,6 +40,7 @@ const styles = theme => ({
   link: {
     textDecoration: 'none'
   },
+
   rightMainSection: {
     zIndex: '1',
     position: 'absolute',
@@ -47,6 +50,9 @@ const styles = theme => ({
     height: '200%',
     transform: `skew(-0.03turn, 15deg)`,
     background: 'rgba(0, 0, 0, 0.2)',
+    '@media (max-width: 768px)': {
+      display: 'none',
+    }    
   },
   leftMarkSection: {
     zIndex: '1',    
@@ -56,9 +62,40 @@ const styles = theme => ({
     top: '15%',
     left: '-100px',
     width: '470px',
-    height: '560px'
+    height: '560px',
+    '@media (max-width: 768px)': {
+      display: 'none',
+    }    
   },
-  headerContainer: {
+  topMainSection: {
+    zIndex: '1',
+    position: 'absolute',
+    top: '-25%',
+    left: '-30%',
+    width: '300%',
+    height: '100%',
+    transform: `rotate(12deg)`,
+    background: 'rgba(0, 0, 0, 0.2)',
+    '@media (min-width: 768px)': {
+      display: 'none',
+    }
+  },
+  bottomMarkSection: {
+    zIndex: '1',
+    position: 'absolute',
+    display: 'flex',
+    flexDirection: 'column',
+    top: '68%',
+    left: '-20px',
+    width: '200px',
+    height: '230px',
+
+    '@media (min-width: 768px)': {
+      display: 'none',
+    }
+  },
+
+  desktopHeaderContainer: {
     zIndex: '2',
     width: '100%',
     height: '90px',
@@ -66,8 +103,22 @@ const styles = theme => ({
     paddingRight: '30px',
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    '@media (max-width: 768px)': {
+      display: 'none',
+    }    
   },
+  mobileHeaderContainer: {
+    zIndex: '2',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '16px',
+    '@media (min-width: 768px)': {
+      display: 'none',
+    }
+  },
+
   logoContainer: {
     zIndex: '2',
     display: 'flex',
@@ -75,7 +126,11 @@ const styles = theme => ({
     justifyContent: 'flex-start',
     flex: 1,
     minWidth: '400px',
+    '@media (max-width: 768px)': {
+      minWidth: '100px',
+    }
   },
+  
   linkContainer: {
     zIndex: '2',
     flex: 2,
@@ -86,12 +141,35 @@ const styles = theme => ({
       marginRight: '40px',
     }
   },
-  bodyContainer: {
+
+  optionsContainer: {
+    zIndex: '2',
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+
+  desktopBodyContainer: {
     zIndex: '2',    
     width: '100%',
     flex: 1,
-    display: 'flex'
+    display: 'flex',
+    '@media (max-width: 768px)': {
+      display: 'none',
+    }
   },
+
+  mobileBodyContainer: {
+    zIndex: '2',
+    width: '100%',
+    flex: 1,
+    display: 'flex',
+    '@media (min-width: 768px)': {
+      display: 'none',
+    }
+  },
+
   bodyLeftContainer: {
     flex: 1,
     minWidth: '400px',
@@ -102,12 +180,17 @@ const styles = theme => ({
     flexDirection: 'column',
   },
   bodyRightSpace: {
-    flex: 1
+    flex: 1,
   },
   bodyRightMain: {
     flex: 5,
     display: 'flex',
-    flexDirection: 'column'
+    flexDirection: 'column',
+    width: '100%',
+    '@media (max-width: 768px)': {
+      padding: '30px',
+      flex: 7,
+    }
   },
   comingSoonTagContainer: {
     background: colors.yellowBackground,
@@ -130,8 +213,11 @@ const styles = theme => ({
   },
 
   linkSwapIconContainer: {
-    height: '80px',
     marginBottom: '30px',
+    width: '100%',
+    '@media (min-width: 768px)': {
+      height: '80px',      
+    }
   },
 
   emailInputContainer: {
@@ -144,6 +230,10 @@ const styles = theme => ({
     alignItems: 'center',
     border: 'solid 1px rgba(255, 255, 255, 0.2)',
     marginBottom: '5px',
+    '@media (max-width: 768px)': {
+      width: '100%',
+      marginLeft: '0px',
+    }
   },
 
   emailInputError: {
@@ -159,7 +249,7 @@ const styles = theme => ({
   },
 
   customInputBoxRoot: {
-    width: '350px',
+    width: '100%',
     height: 42,
     background: 'transparent',
     borderRadius: 3,
@@ -202,9 +292,36 @@ const styles = theme => ({
   },
   socialMediaContainer: {
     marginLeft: '6px',
+    display: 'flex',
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    '@media (max-width: 768px)': {
+      justifyContent: 'center',
+    }
   },
   loadingIcon: {
     color: colors.white,
+  },
+  desktopBackground: {
+    position: 'absolute',
+    width: '100vw',
+    height: '100vh',
+    top: '0px',
+    left: '0px',
+    '@media (max-width: 768px)': {
+      display: 'none',
+    }
+  },
+  mobileBackground: {
+    position: 'absolute',
+    width: '100vw',
+    height: '100vh',
+    top: '0px',
+    left: '0px',
+    '@media (min-width: 768px)': {
+      display: 'none',
+    }
   }
 });
 
@@ -219,108 +336,62 @@ const ValidateEmail = (mail) => {
 const store = Store.store
 const mailchimpUrl = "https://yflink.us17.list-manage.com/subscribe/post?u=f170cca247406899e9a7fbe82&amp;id=feee202dc5";
 
-const CustomForm = ({ status, message, onValidated }) => {
-  let email, name;
-  const submit = () =>
-    email &&
-    name &&
-    email.value.indexOf("@") > -1 &&
-    onValidated({
-      EMAIL: email.value,
-      NAME: name.value
-    });
-
-  return (
-    <div
-      style={{
-        background: "#efefef",
-        borderRadius: 2,
-        padding: 10,
-        display: "inline-block"
-      }}
-    >
-      {status === "sending" && <div style={{ color: "blue" }}>sending...</div>}
-      {status === "error" && (
-        <div
-          style={{ color: "red" }}
-          dangerouslySetInnerHTML={{ __html: message }}
-        />
-      )}
-      {status === "success" && (
-        <div
-          style={{ color: "green" }}
-          dangerouslySetInnerHTML={{ __html: message }}
-        />
-      )}
-      <input
-        style={{ fontSize: "2em", padding: 5 }}
-        ref={node => (name = node)}
-        type="text"
-        placeholder="Your name"
-      />
-      <br />
-      <input
-        style={{ fontSize: "2em", padding: 5 }}
-        ref={node => (email = node)}
-        type="email"
-        placeholder="Your email"
-      />
-      <br />
-      <button style={{ fontSize: "2em", padding: 5 }} onClick={submit}>
-        Submit
-      </button>
-    </div>
-  );
-};
-
 class Initial extends Component {
 
   constructor(props) {
     super(props)
     this.state = {
       inputEmail: '',
-      error: ''
+      error: '',
+      modalOpen: false,
     }
   }
 
-  onSubmit = async (email) => {
-    if (!email) {
-      this.setState({ inputEmail: '', error: 'Please input email address!' })
-      return
-    }
-    const isInvalid = ValidateEmail(email)
-    if (isInvalid) {
-      this.setState({ inputEmail: email, error: isInvalid })
-      return
-    }
-    console.log('onSubmit success', email)
-
-  }
-
-  renderHeader = () => {
+  renderHeader = (screenType) => {
     const { classes } = this.props
     const account = store.getStore('account')
-    return (
-      <div className={ classes.headerContainer }>
-        <div className={ classes.logoContainer }>
-          <HeaderLogo />
+    if (screenType === 'DESKTOP') {
+      return (
+        <div className={ classes.desktopHeaderContainer }>
+          <div className={ classes.logoContainer }>
+            <HeaderLogo />
+          </div>
+          <div className={classes.linkContainer}>
+            <HeaderLink text='STAKE' to={account && account.address ? '/staking' : '/account'} redirectedTo={'/staking'} />
+            <HeaderLink text='VOTE' to={account && account.address ? '/vote' : '/account'} redirectedTo={'/vote'} />
+            <HeaderLink text='LINKSWAP' to='/' disabled tag='SOON' />
+            <HeaderLink text='PRODUCTS' to='/' disabled tag='SOON' />
+          </div>
         </div>
-        <div className={classes.linkContainer}>
-          <HeaderLink text='STAKE' to={account && account.address ? '/staking' : '/account'} redirectedTo={'/staking'} />
-          <HeaderLink text='VOTE' to={account && account.address ? '/vote' : '/account'} redirectedTo={'/vote'} />
-          <HeaderLink text='LINKSWAP' to='/' disabled tag='SOON' />
-          <HeaderLink text='PRODUCTS' to='/' disabled tag='SOON' />
+      )
+    } else {
+      return (
+        <div className={ classes.mobileHeaderContainer }>
+          <div className={ classes.logoContainer }>
+            <HeaderLogo />
+          </div>
+          <div className={classes.optionsContainer}>
+            <IconButton
+              onClick={() => {
+                this.setState({modalOpen: true})
+              }}
+            >
+              <OptionsIcon style={{color: colors.white}}/>
+            </IconButton>
+          </div>
         </div>
-      </div>
-    )
+      )
+    }
   }
 
-  renderBody = () => {
+  renderBody = (screenType) => {
     const { classes } = this.props
     const { inputEmail, error } = this.state
     return (
-      <div className={ classes.bodyContainer }>
-        <div className={ classes.bodyLeftContainer } />
+      <div className={ screenType === 'DESKTOP' ? classes.desktopBodyContainer : classes.mobileBodyContainer }>
+        {screenType === 'DESKTOP' && (
+          <div className={classes.bodyLeftContainer} />
+        )}
         <div className={classes.bodyRightContainer}>
           <div className={classes.bodyRightSpace} />
           <div className={classes.bodyRightMain} >
@@ -333,7 +404,11 @@ class Initial extends Component {
               </Typography>
             </div>
             <div className={classes.linkSwapIconContainer}>
-              <img alt="linkswap" src={require("../../assets/YFLink-linkswap-logo.svg")} height="80px" />
+              {screenType === 'MOBILE' ? (
+                <img alt="linkswap" src={require("../../assets/YFLink-linkswap-logo.svg")} width="100%" />
+              ) : (
+                <img alt="linkswap" src={require("../../assets/YFLink-linkswap-logo.svg")} height="80px" />
+              )}
             </div>
               <MailchimpSubscribe
                 url={mailchimpUrl}
@@ -415,7 +490,7 @@ class Initial extends Component {
                 githubUrl="https://github.com/yflink"
                 mediumUrl="https://medium.com/yflink"
                 telegramUrl="https://t.me/YFLinkGroup"
-                discordUrl="https://discord.gg/2dMUdG"
+                discordUrl="https://discord.gg/nQWEx88"
               />
             </div>
           </div>
@@ -424,18 +499,57 @@ class Initial extends Component {
     )
   }
 
+  renderBackground = (screenType) => {
+    const { classes } = this.props
+
+    if (screenType === 'DESKTOP') {
+      return (
+        <>
+          <div className={classes.rightMainSection} />
+          <div className={classes.leftMarkSection}>
+            <img alt="up" src={require("../../assets/yfl-up.svg")} height="200px" />
+            <img alt="down" src={require("../../assets/yfl-down.svg")} height="200px" />
+          </div>
+        </>
+      )
+    } else if (screenType === 'MOBILE') {
+      return (
+        <>
+          <div className={classes.topMainSection} />
+          <div className={classes.bottomMarkSection}>
+            <img alt="up" src={require("../../assets/yfl-up.svg")} height="112px" />
+            <img alt="down" src={require("../../assets/yfl-down.svg")} height="112px" />
+          </div>
+        </>
+      )
+    }
+  }
+
+  renderModal = () => {
+    const account = store.getStore('account')
+    return (
+      <RedirectModal closeModal={this.closeModal} modalOpen={this.state.modalOpen} account={account}/>
+    )
+  }
+
+  closeModal = () => {
+    this.setState({ modalOpen: false })
+  }
+
   render() {
     const { classes } = this.props;
 
     return (
       <div className={classes.root}>
-        <div className={classes.rightMainSection} />
-        <div className={classes.leftMarkSection}>
-          <img alt="up" src={require("../../assets/yfl-up.svg")} height="200px" />
-          <img alt="down" src={require("../../assets/yfl-down.svg")} height="200px" />
-        </div>
-        {this.renderHeader()}
-        {this.renderBody()}
+        {this.renderBackground('DESKTOP')}
+        {this.renderBackground('MOBILE')}
+
+        {this.renderHeader('DESKTOP')}
+        {this.renderHeader('MOBILE')}
+        
+        {this.renderBody('DESKTOP')}
+        {this.renderBody('MOBILE')}
+        {this.renderModal()}
       </div>
     )
   };
