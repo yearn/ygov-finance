@@ -100,6 +100,9 @@ const styles = theme => ({
     height: '200%',
     transform: `skew(-0.03turn, 15deg)`,
     background: 'rgba(0, 0, 0, 0.2)',
+    '@media (max-width: 768px)': {
+      display: 'none',
+    }    
   },
   leftMarkSection: {
     zIndex: '1',    
@@ -109,8 +112,39 @@ const styles = theme => ({
     top: '15%',
     left: '-100px',
     width: '470px',
-    height: '560px'
+    height: '560px',
+    '@media (max-width: 768px)': {
+      display: 'none',
+    }    
   },
+  topMainSection: {
+    zIndex: '1',
+    position: 'absolute',
+    top: '-25%',
+    left: '-30%',
+    width: '300%',
+    height: '100%',
+    transform: `rotate(12deg)`,
+    background: 'rgba(0, 0, 0, 0.2)',
+    '@media (min-width: 768px)': {
+      display: 'none',
+    }
+  },
+  bottomMarkSection: {
+    zIndex: '1',
+    position: 'absolute',
+    display: 'flex',
+    flexDirection: 'column',
+    top: '68%',
+    left: '-20px',
+    width: '200px',
+    height: '230px',
+
+    '@media (min-width: 768px)': {
+      display: 'none',
+    }
+  },
+
   mainBodySection: {
     zIndex: '3',
     display: 'flex',
@@ -121,13 +155,16 @@ const styles = theme => ({
   headerContainer: {
     position: 'absolute',
     top: '0',
-    left: '30px',
+    padding: '30px',
     zIndex: '2',
     width: '100%',
-    height: '90px',
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'flex-start'
+    justifyContent: 'flex-start',
+    '@media (max-width: 768px)': {
+      padding: '16px',
+      height: '68px',
+    }
   },
   logoContainer: {
     zIndex: '2',
@@ -218,17 +255,40 @@ class Account extends Component {
     )
   }
 
+  renderBackground = (screenType) => {
+    const { classes } = this.props
+
+    if (screenType === 'DESKTOP') {
+      return (
+        <>
+          <div className={classes.rightMainSection} />
+          <div className={classes.leftMarkSection}>
+            <img alt="up" src={require("../../assets/yfl-up.svg")} height="200px" />
+            <img alt="down" src={require("../../assets/yfl-down.svg")} height="200px" />
+          </div>
+        </>
+      )
+    } else if (screenType === 'MOBILE') {
+      return (
+        <>
+          <div className={classes.topMainSection} />
+          <div className={classes.bottomMarkSection}>
+            <img alt="up" src={require("../../assets/yfl-up.svg")} height="112px" />
+            <img alt="down" src={require("../../assets/yfl-down.svg")} height="112px" />
+          </div>
+        </>
+      )
+    }
+  }
+
   renderNotConnected = () => {
     const { classes } = this.props
     const { loading } = this.state
 
     return (
       <div className={classes.notConnectedRoot}>
-        <div className={classes.rightMainSection} />
-        <div className={classes.leftMarkSection}>
-          <img alt="up" src={require("../../assets/yfl-up.svg")} height="200px" />
-          <img alt="down" src={require("../../assets/yfl-down.svg")} height="200px" />
-        </div>
+        {this.renderBackground('DESKTOP')}
+        {this.renderBackground('MOBILE')}
         {this.renderHeader()}
         <div className={classes.mainBodySection} >
           <Typography variant={'h5'} className={ classes.disclaimer }>This project is in beta. Use at your own risk.</Typography>
