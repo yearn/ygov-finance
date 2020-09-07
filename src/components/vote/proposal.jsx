@@ -24,9 +24,13 @@ import {
 } from '../../constants'
 
 import CopyIcon from '@material-ui/icons/FileCopy';
+import CancelIcon from '@material-ui/icons/Cancel';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import WarningIcon from '@material-ui/icons/Warning';
 import { colors } from '../../theme'
 
 import Store from "../../stores";
+import { green, red, orange } from "@material-ui/core/colors";
 const emitter = Store.emitter
 const dispatcher = Store.dispatcher
 const store = Store.store
@@ -100,6 +104,18 @@ const styles = theme => ({
   heading: {
     flexShrink: 0
   },
+
+  votesHeading: {
+    display: 'none',
+    paddingTop: '12px',
+    flex: 1,
+    flexShrink: 0,
+    [theme.breakpoints.up('sm')]: {
+      paddingTop: '5px',
+      display: 'block'
+    }
+  },
+
   YIPheading: {
     width: '64px',
     flexShrink: 0
@@ -220,6 +236,27 @@ class Proposal extends Component {
     this.setState({ loading: false })
   };
 
+  votingMessage = (proposal) => {
+    let message;
+    if(proposal.myVotes > 0)
+      message = "You have voted " + proposal.direction + ".";
+    else
+      message = "You have not voted.";
+
+    if (proposal.canStillVote && proposal.myVotes === 0)
+      message += " Please vote now.";
+
+    return message;
+  };
+
+  formatVotes = (votes) => {
+    return (parseFloat(votes)/10**18).toLocaleString(undefined, { maximumFractionDigits: 4, minimumFractionDigits: 4 });
+  }
+
+  formatAsPercent = (ratio) => {
+    return (ratio * 100.0).toFixed(2).toLocaleString(undefined, { maximumFractionDigits: 4, minimumFractionDigits: 4 });
+  }
+
   render() {
     const { classes, proposal } = this.props;
     const {
@@ -284,6 +321,40 @@ class Proposal extends Component {
             <Typography variant={ 'h5' } className={ classes.grey }>Vote End: {proposal.end}</Typography>
           </div>
         </div>
+        <div className={ classes.assetSummary }>
+          <div className={classes.headingName}>
+            <div className={ classes.YIPheading }>
+              { proposal.myVotes > 0 && proposal.direction === "FOR" &&
+                <CheckCircleIcon style={{ fontSize: 20, color: green[500] }}/>
+              }
+              { proposal.myVotes > 0 && proposal.direction === "AGAINST" &&
+                <CancelIcon style={{ fontSize: 20, color: red[500] }} />
+              }
+              {
+                proposal.myVotes === 0 &&
+                <WarningIcon style={{ fontSize: 20, color: orange[500] }}/>
+              }
+            </div>
+            <div>
+              <div className={ classes.proposerAddressContainer }>
+                <Typography variant={'h3'}>{ this.votingMessage(proposal) }</Typography>
+              </div>
+              <Typography variant={ 'h5' } className={ classes.grey }>Status</Typography>
+            </div>
+          </div>
+          <div className={ classes.votesHeading }>
+            <Typography variant={ 'h3' }>{ this.formatVotes(proposal.myVotes) }</Typography>
+            <Typography variant={ 'h5' } className={ classes.grey }>Used votes</Typography>
+          </div>
+          <div className={ classes.votesHeading }>
+            <Typography variant={ 'h3' }>{ proposal.canStillVote ? this.formatVotes(proposal.availableVotes): 0 }</Typography>
+            <Typography variant={ 'h5' } className={ classes.grey }>Available votes</Typography>
+          </div>
+          <div className={ classes.votesHeading }>
+            <Typography variant={ 'h3' }>{ this.formatAsPercent(proposal.myVotesRatio) }%</Typography>
+            <Typography variant={ 'h5' } className={ classes.grey }>Participation weight</Typography>
+          </div>
+        </div>
         { proposal.end > currentBlock &&
           <div>
             { (governanceContractVersion === 2 && votingStatus !== true) &&
@@ -302,7 +373,7 @@ class Proposal extends Component {
                 </div>
               </div>
             }
-            { (governanceContractVersion !== 2 || votingStatus === true) &&
+            { (governanceContractVersion !== 2 || votingStatus === true) && proposal.canStillVote === true &&
               <div className={ classes.actionsContainer }>
                 <div className={ classes.tradeContainer }>
                   <Button

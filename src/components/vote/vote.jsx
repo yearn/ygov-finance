@@ -20,6 +20,10 @@ import Snackbar from '../snackbar'
 import UnlockModal from '../unlock/unlockModal.jsx'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import CopyIcon from '@material-ui/icons/FileCopy';
+import CancelIcon from '@material-ui/icons/Cancel';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import WarningIcon from '@material-ui/icons/Warning';
+
 import Proposal from './proposal'
 
 import Store from "../../stores";
@@ -40,6 +44,9 @@ import {
   REGISTER_VOTE_RETURNED,
   REGISTER_VOTE
 } from '../../constants'
+import { green, red, orange } from "@material-ui/core/colors";
+
+
 
 const styles = theme => ({
   root: {
@@ -460,8 +467,21 @@ class Vote extends Component {
           >
             <div className={ classes.assetSummary }>
               <div className={classes.headingName}>
-                <div className={ classes.assetIcon }>
-                  <Typography variant={ 'h3' }>{ proposal.id }</Typography>
+                <div className={classes.heading}>
+                  <Typography variant={'h3'}>
+                    { proposal.myVotes > 0 && proposal.direction === "FOR" &&
+                      <CheckCircleIcon style={{ fontSize: 20, color: green[500] }}/>
+                    }
+                    { proposal.myVotes > 0 && proposal.direction === "AGAINST" &&
+                      <CancelIcon style={{ fontSize: 20, color: red[500] }} />
+                    }
+                    {
+                      proposal.myVotes === 0 &&
+                      <WarningIcon style={{ fontSize: 20, color: orange[500] }}/>
+                    }
+                    <span style={{ paddingLeft: 8}}>{ proposal.id }</span>
+                  </Typography>
+                  <Typography variant={ 'h5' } className={ classes.grey }>Vote Status</Typography>
                 </div>
                 <div>
                   <div className={ classes.proposerAddressContainer }>
