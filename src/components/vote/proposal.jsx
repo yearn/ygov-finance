@@ -155,6 +155,11 @@ const styles = theme => ({
     '&:hover > svg': {
       visibility: 'visible'
     }
+  },
+  notifyVoteLock: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
   }
 });
 
@@ -374,31 +379,36 @@ class Proposal extends Component {
               </div>
             }
             { (governanceContractVersion !== 2 || votingStatus === true) && proposal.canStillVote === true &&
-              <div className={ classes.actionsContainer }>
-                <div className={ classes.tradeContainer }>
-                  <Button
-                    className={ classes.actionButton }
-                    variant="outlined"
-                    color="primary"
-                    disabled={ loading || proposal.end < currentBlock }
-                    onClick={ this.onVoteFor }
-                    fullWidth
-                    >
-                    <Typography className={ classes.buttonText } variant={ 'h5'} color={'secondary'}>Vote For</Typography>
-                  </Button>
+              <div>
+                <div className={ classes.actionsContainer }>
+                  <div className={ classes.tradeContainer }>
+                    <Button
+                      className={ classes.actionButton }
+                      variant="outlined"
+                      color="primary"
+                      disabled={ loading || proposal.end < currentBlock }
+                      onClick={ this.onVoteFor }
+                      fullWidth
+                      >
+                      <Typography className={ classes.buttonText } variant={ 'h5'} color={'secondary'}>Vote For</Typography>
+                    </Button>
+                  </div>
+                  <div className={ classes.sepperator }></div>
+                  <div className={classes.tradeContainer}>
+                    <Button
+                      className={ classes.actionButton }
+                      variant="outlined"
+                      color="primary"
+                      disabled={ loading || proposal.end < currentBlock }
+                      onClick={ this.onVoteAgainst }
+                      fullWidth
+                      >
+                      <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Vote Against</Typography>
+                    </Button>
+                  </div>
                 </div>
-                <div className={ classes.sepperator }></div>
-                <div className={classes.tradeContainer}>
-                  <Button
-                    className={ classes.actionButton }
-                    variant="outlined"
-                    color="primary"
-                    disabled={ loading || proposal.end < currentBlock }
-                    onClick={ this.onVoteAgainst }
-                    fullWidth
-                    >
-                    <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Vote Against</Typography>
-                  </Button>
+                <div className={ classes.notifyVoteLock }>
+                  Every time you vote, your staked YFI will be locked for 3 days before you can unstake it again.
                 </div>
               </div>
             }
