@@ -92,31 +92,7 @@ const styles = theme => ({
     border: '1px solid rgb(174, 174, 174)',
     borderRadius: '0.75rem',
     marginBottom: '24px',
-  },
-  addressContainer: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    overflow: 'hidden',
-    flex: 1,
-    whiteSpace: 'nowrap',
-    fontSize: '0.83rem',
-    textOverflow:'ellipsis',
-    cursor: 'pointer',
-    padding: '28px 30px',
-    borderRadius: '50px',
-    border: '1px solid '+colors.borderBlue,
-    alignItems: 'center',
-    maxWidth: '500px',
-    [theme.breakpoints.up('md')]: {
-      width: '100%'
-    }
-  },
-  walletAddress: {
-    padding: '0px 12px'
-  },
-  walletTitle: {
-    flex: 1,
-    color: colors.darkGray
+    background: colors.white,
   },
   proposalContainer: {
     display: 'flex',
@@ -217,11 +193,6 @@ class Propose extends Component {
       governanceContractVersion
     } = this.state
 
-    var address = null;
-    if (account.address) {
-      address = account.address.substring(0,6)+'...'+account.address.substring(account.address.length-4,account.address.length)
-    }
-
     return (
       <div className={ classes.root }>
         <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
@@ -235,11 +206,6 @@ class Propose extends Component {
           >
             <Typography variant={ 'h4'}>Back</Typography>
           </Button>
-          <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
-            <Typography variant={ 'h3'} className={ classes.walletTitle } noWrap>Wallet</Typography>
-            <Typography variant={ 'h4'} className={ classes.walletAddress } noWrap>{ address }</Typography>
-            <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}></div>
-          </Card>
         </div>
         <div className={ classes.proposalContainer }>
           { governanceContractVersion === 2 &&

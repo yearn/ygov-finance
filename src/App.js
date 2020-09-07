@@ -155,6 +155,7 @@ class App extends Component {
                   <Home />
                 </Route>
               </Switch>
+              <Footer />
             </div>
           }
         </IpfsRouter>
