@@ -471,12 +471,13 @@ class Store {
   }
 
   _checkApproval = async (asset, account, amount, contract, callback) => {
-    if (!asset.abi.allowance) {
-      return callback() // Doesn't need approval
-    }
     try {
       const web3 = new Web3(store.getStore('web3context').library.provider);
       const erc20Contract = new web3.eth.Contract(asset.abi, asset.address)
+
+      if (!erc20Contract.methods.allowance) {
+        return callback() // Doesn't need approval
+      }
       const allowance = await erc20Contract.methods.allowance(account.address, contract).call({ from: account.address })
 
       if(bigInt(allowance).lesser(amount)) {
