@@ -91,7 +91,9 @@ class Link extends Component {
         <div
           className={classes.root}
           onClick={() => {
-            store.setStore({redirect : redirectedTo})
+            if (redirectedTo) {
+              store.setStore({redirect : redirectedTo})
+            }
             this.nav(to)
           }}
         >
@@ -121,7 +123,9 @@ class Link extends Component {
         <div
           className={classes.root}
           onClick={() => {
-            store.setStore({redirect : redirectedTo})
+            if (redirectedTo) {
+              store.setStore({redirect : redirectedTo})
+            }
             this.nav(to)
           }}
         >
@@ -149,7 +153,12 @@ class Link extends Component {
   };
 
   nav = (screen) => {
-    this.props.history.push(screen)
+    const { externalLink } = this.props;
+    if (externalLink) {
+      window.open(screen)
+    } else {
+      this.props.history.push(screen)
+    }
   }
 }
 
