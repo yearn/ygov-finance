@@ -359,7 +359,7 @@ class Initial extends Component {
           <div className={classes.linkContainer}>
             <HeaderLink text='STAKE' to={account && account.address ? '/staking' : '/account'} redirectedTo={'/staking'} />
             <HeaderLink text='VOTE' to={account && account.address ? '/vote' : '/account'} redirectedTo={'/vote'} />
-            <HeaderLink text='UNISWAP' to={'https://app.uniswap.org/#/swap?inputCurrency=0x28cb7e841ee97947a86b06fa4090c8451f64c0be'} externalLink={true}/>
+            <HeaderLink text='BUY YFL' to={'https://app.uniswap.org/#/swap?outputCurrency=0x28cb7e841ee97947a86b06fa4090c8451f64c0be'} externalLink={true} />
             <HeaderLink text='LINKSWAP' to='/' disabled tag='SOON' />
             {/* <HeaderLink text='PRODUCTS' to='/' disabled tag='SOON' /> */}
           </div>
