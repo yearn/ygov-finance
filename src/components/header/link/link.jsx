@@ -77,6 +77,7 @@ const styles = (theme) => ({
     letterSpacing: "0.06em",
     color: colors.white,
   },
+
   linkTextSelectedMark: {
     position: "absolute",
     bottom: "-8px",

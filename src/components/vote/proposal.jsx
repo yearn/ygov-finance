@@ -229,7 +229,7 @@ class Proposal extends Component {
 
   render() {
     const { classes, proposal } = this.props;
-    const { loading, currentBlock, currentTime, title } = this.state;
+    const { currentBlock, currentTime, title } = this.state;
 
     const blocksTillEnd = proposal.end - currentBlock;
     const blocksSinceStart = currentBlock - proposal.start;
