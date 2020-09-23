@@ -1254,11 +1254,13 @@ class Store {
       const web3 = new Web3(store.getStore('web3context').library.provider);
 
       const governanceContract = new web3.eth.Contract(config.governanceV2ABI,config.governanceV2Address)
-
+      
+      const breaker = await governanceContract.methods.breaker().call()
       const voteLock = await governanceContract.methods.voteLock(account.address).call({ from: account.address })
       const currentBlock = await web3.eth.getBlockNumber()
-
+    
       const returnOBJ = {
+        breakerEnabled: breaker,
         voteLockValid: voteLock > currentBlock,
         voteLock: voteLock
       }
