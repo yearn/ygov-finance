@@ -294,6 +294,7 @@ class Stake extends Component {
 
   govRequirementsReturned = (requirements) => {
     this.setState({
+      gov_breakerEnabled: requirements.breakerEnabled,
       gov_voteLockValid: requirements.voteLockValid,
       gov_voteLock: requirements.voteLock
     })
@@ -397,6 +398,7 @@ class Stake extends Component {
       voteLockValid,
       balanceValid,
       voteLock,
+      gov_breakerEnabled,
       gov_voteLockValid,
       gov_voteLock,
     } = this.state
@@ -422,7 +424,7 @@ class Stake extends Component {
             className={ classes.actionButton }
             variant="outlined"
             color="primary"
-            disabled={ loading || (['GovernanceV2'].includes(pool.id) && !gov_voteLockValid) }
+            disabled={ loading || (['GovernanceV2'].includes(pool.id) && !gov_voteLockValid && !gov_breakerEnabled) }
             onClick={ () => { this.onClaim() } }
             >
             <Typography className={ classes.buttonText } variant={ 'h4'}>Claim Rewards</Typography>
