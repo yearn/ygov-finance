@@ -294,6 +294,7 @@ class Stake extends Component {
 
   govRequirementsReturned = (requirements) => {
     this.setState({
+      gov_breakerEnabled: requirements.breakerEnabled,
       gov_voteLockValid: requirements.voteLockValid,
       gov_voteLock: requirements.voteLock
     })
@@ -397,6 +398,7 @@ class Stake extends Component {
       voteLockValid,
       balanceValid,
       voteLock,
+      gov_breakerEnabled,
       gov_voteLockValid,
       gov_voteLock,
     } = this.state
@@ -422,7 +424,7 @@ class Stake extends Component {
             className={ classes.actionButton }
             variant="outlined"
             color="primary"
-            disabled={ loading || (['GovernanceV2'].includes(pool.id) && !gov_voteLockValid) }
+            disabled={ loading || (['GovernanceV2'].includes(pool.id) && !gov_voteLockValid && !gov_breakerEnabled) }
             onClick={ () => { this.onClaim() } }
             >
             <Typography className={ classes.buttonText } variant={ 'h4'}>Claim Rewards</Typography>
@@ -455,7 +457,7 @@ class Stake extends Component {
           }
         </div>
         { (['Governance', 'GovernanceV2'].includes(pool.id) && voteLockValid) && <Typography variant={'h4'} className={ classes.voteLockMessage }>Unstaking tokens only allowed once all your pending votes have closed at Block: {voteLock}</Typography> }
-        { (['GovernanceV2'].includes(pool.id) && !gov_voteLockValid) && <Typography variant={'h4'} className={ classes.voteLockMessage }>You need to have voted recently in order to claim rewards</Typography> }
+        { (['GovernanceV2'].includes(pool.id) && !gov_voteLockValid  && !gov_breakerEnabled) && <Typography variant={'h4'} className={ classes.voteLockMessage }>You need to have voted recently in order to claim rewards</Typography> }
         { (['GovernanceV2'].includes(pool.id) && gov_voteLockValid) && <Typography variant={'h4'} className={ classes.voteLockMessage }>You have recently voted, you can unstake at block {gov_voteLock}</Typography> }
       </div>
     )
