@@ -46,9 +46,9 @@ import {
 } from '../../constants'
 import { green, red, orange } from "@material-ui/core/colors";
 
+const mobileBreakpoint = 640
 
-
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     flex: 1,
     display: 'flex',
@@ -157,10 +157,11 @@ const styles = theme => ({
     }
   },
   heading: {
-    display: 'none',
+    display: 'flex',
     paddingTop: '12px',
     flex: 1,
     flexShrink: 0,
+    flexDirection: 'column',
     [theme.breakpoints.up('sm')]: {
       paddingTop: '5px',
       display: 'block'
@@ -168,7 +169,8 @@ const styles = theme => ({
   },
   assetSummary: {
     display: 'flex',
-    alignItems: 'center',
+    flexDirection: window.innerWidth <= mobileBreakpoint ? 'column' : 'unset',
+    alignItems: window.innerWidth <= mobileBreakpoint ? 'left' : 'center',
     flex: 1,
     flexWrap: 'wrap',
     [theme.breakpoints.up('sm')]: {
@@ -207,7 +209,7 @@ const styles = theme => ({
     flexWrap: 'wrap',
     padding: '28px 30px',
     borderRadius: '50px',
-    border: '1px solid '+colors.borderBlue,
+    border: '1px solid ' + colors.borderBlue,
     margin: '20px',
     background: colors.white,
     width: '100%'
@@ -440,22 +442,24 @@ class Vote extends Component {
           >
             <div className={ classes.assetSummary }>
               <div className={classes.headingName}>
-                <div className={classes.heading}>
-                  <Typography variant={'h3'}>
-                    { proposal.myVotes > 0 && proposal.direction === "FOR" &&
-                      <CheckCircleIcon style={{ fontSize: 20, color: green[500] }}/>
-                    }
-                    { proposal.myVotes > 0 && proposal.direction === "AGAINST" &&
-                      <CancelIcon style={{ fontSize: 20, color: red[500] }} />
-                    }
-                    {
-                      proposal.myVotes === 0 &&
-                      <WarningIcon style={{ fontSize: 20, color: orange[500] }}/>
-                    }
-                    <span style={{ paddingLeft: 8}}>{ proposal.id }</span>
-                  </Typography>
-                  <Typography variant={ 'h5' } className={ classes.grey }>Vote Status</Typography>
-                </div>
+                {width <= mobileBreakpoint ? <div /> :
+                  <div className={classes.heading}>
+                    <Typography variant={'h3'}>
+                      {proposal.myVotes > 0 && proposal.direction === "FOR" &&
+                        <CheckCircleIcon style={{ fontSize: 20, color: green[500] }} />
+                      }
+                      {proposal.myVotes > 0 && proposal.direction === "AGAINST" &&
+                        <CancelIcon style={{ fontSize: 20, color: red[500] }} />
+                      }
+                      {
+                        proposal.myVotes === 0 &&
+                        <WarningIcon style={{ fontSize: 20, color: orange[500] }} />
+                      }
+                      <span style={{ paddingLeft: 8 }}>{proposal.id}</span>
+                    </Typography>
+                    <Typography variant={'h5'} className={classes.grey}>Vote Status</Typography>
+                  </div>
+                }
                 <div>
                   <div className={ classes.proposerAddressContainer }>
                     <Typography variant={'h3'}>{address}</Typography>
