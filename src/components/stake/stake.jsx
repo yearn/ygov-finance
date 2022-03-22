@@ -9,6 +9,7 @@ import {
   InputAdornment
 } from '@material-ui/core';
 import { withNamespaces } from 'react-i18next';
+import { BigNumber } from 'bignumber.js';
 
 import CheckIcon from '@material-ui/icons/Check';
 import ClearIcon from '@material-ui/icons/Clear';
@@ -655,7 +656,7 @@ class Stake extends Component {
   }
 
   setAmount = (id, type, balance) => {
-    const bal = (Math.floor((balance === '' ? '0' : balance)*10000)/10000).toFixed(4)
+    const bal = new BigNumber(balance === '' ? '0' : balance).toFixed(18)
     let val = []
     val[id + '_' + type] = bal
     this.setState(val)
